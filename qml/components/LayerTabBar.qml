@@ -58,7 +58,7 @@ Item {
                         id: tabText
                         text: tabButton.modelData.name + " [" + tabButton.modelData.index + "]"
                         font.bold: tabButton.isSelected || tabButton.isCurrentHardwareActive
-                        font.pixelSize: 12
+                        font.pointSize: 9.5
                         color: tabButton.isSelected ? "#ffffff" : palette.text
                         anchors.verticalCenter: parent.verticalCenter
                     }

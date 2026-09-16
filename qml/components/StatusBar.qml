@@ -35,7 +35,7 @@ Rectangle {
                 text: root.dbusClient && root.dbusClient.connected ? 
                       root.dbusClient.deviceName + " (" + root.dbusClient.deviceNode + ")" : 
                       qsTr("Keyboard Disconnected")
-                font.pixelSize: 11
+                font.pointSize: 9
                 font.bold: true
                 color: palette.text
                 anchors.verticalCenter: parent.verticalCenter
@@ -46,7 +46,7 @@ Rectangle {
         Text {
             visible: root.dbusClient && root.dbusClient.connected && root.dbusClient.buildId.length > 0
             text: qsTr("Build: ") + root.dbusClient.buildId
-            font.pixelSize: 11
+            font.pointSize: 9
             color: palette.placeholderText
             anchors.verticalCenter: parent.verticalCenter
         }
@@ -64,7 +64,7 @@ Rectangle {
                 id: cacheText
                 text: root.dbusClient.isCached ? qsTr("Cached") : qsTr("Live")
                 anchors.centerIn: parent
-                font.pixelSize: 10
+                font.pointSize: 8
                 font.bold: true
                 color: "#ffffff"
             }
@@ -92,7 +92,7 @@ Rectangle {
                 id: activeLayerText
                 text: qsTr("HW Active: ") + (root.dbusClient ? root.dbusClient.activeLayerName : "")
                 anchors.centerIn: parent
-                font.pixelSize: 11
+                font.pointSize: 9
                 font.bold: true
                 color: "#38bdf8"
             }
@@ -102,7 +102,7 @@ Rectangle {
         Button {
             text: qsTr("Refresh")
             anchors.verticalCenter: parent.verticalCenter
-            font.pixelSize: 11
+            font.pointSize: 9
             onClicked: {
                 if (root.dbusClient) {
                     root.dbusClient.refreshKeymap();
@@ -114,7 +114,7 @@ Rectangle {
         Button {
             text: qsTr("Clear Cache")
             anchors.verticalCenter: parent.verticalCenter
-            font.pixelSize: 11
+            font.pointSize: 9
             onClicked: {
                 if (root.dbusClient) {
                     root.dbusClient.clearCache();

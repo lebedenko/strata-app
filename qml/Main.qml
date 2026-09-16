@@ -51,7 +51,7 @@ ApplicationWindow {
 
             Text {
                 text: qsTr("STRATA")
-                font.pixelSize: 15
+                font.pointSize: 12
                 font.bold: true
                 font.letterSpacing: 2
                 color: palette.text
@@ -76,7 +76,7 @@ ApplicationWindow {
             CheckBox {
                 text: qsTr("Show Key IDs")
                 checked: configManager ? configManager.showKeyPositions : false
-                font.pixelSize: 11
+                font.pointSize: 9
                 anchors.verticalCenter: parent.verticalCenter
                 onToggled: {
                     if (configManager) {

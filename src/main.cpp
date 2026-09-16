@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QIcon>
+#include <QLoggingCategory>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QQuickWindow>
@@ -14,6 +15,9 @@
 using namespace strata;
 
 int main(int argc, char *argv[]) {
+    // Suppress internal Qt Wayland warning regarding missing X11 systemTrayWindowChanged signal
+    QLoggingCategory::setFilterRules("qt.core.qobject.connect.warning=false\n");
+
     QApplication app(argc, argv);
     app.setApplicationName("Strata");
     app.setApplicationDisplayName("Strata");

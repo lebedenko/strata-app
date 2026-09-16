@@ -56,7 +56,7 @@ tasks:
     deps: [build]
     cmds:
       - mkdir -p ~/.local/bin ~/.local/share/applications ~/.local/share/icons/hicolor/scalable/apps
-      - cp build/strata ~/.local/bin/
+      - install -m 755 build/strata ~/.local/bin/
       - cp desktop/org.freedesktop.Strata.desktop ~/.local/share/applications/
       - cp desktop/strata.svg ~/.local/share/icons/hicolor/scalable/apps/
       - update-desktop-database ~/.local/share/applications/ || true

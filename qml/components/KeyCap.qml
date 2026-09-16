@@ -49,7 +49,7 @@ Item {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.margins: 4
-            font.pixelSize: 8
+            font.pointSize: 6.5
             font.bold: true
             color: palette.placeholderText
         }
@@ -62,7 +62,7 @@ Item {
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.margins: 4
-            font.pixelSize: 9
+            font.pointSize: 7.5
             font.bold: true
             font.capitalization: Font.AllUppercase
             color: root.accentColor
@@ -74,10 +74,10 @@ Item {
             text: root.primaryText
             anchors.centerIn: parent
             anchors.verticalCenterOffset: root.secondaryText.length > 0 ? 3 : 0
-            font.pixelSize: {
-                if (root.primaryText.length <= 2) return 14;
-                if (root.primaryText.length <= 4) return 10;
-                return 9;
+            font.pointSize: {
+                if (root.primaryText.length <= 2) return 10.5;
+                if (root.primaryText.length <= 4) return 8.5;
+                return 7.5;
             }
             font.bold: true
             color: palette.text
