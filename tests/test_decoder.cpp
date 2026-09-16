@@ -85,6 +85,43 @@ void test_sensors() {
     std::cout << "[PASS] Sensor decoding\n";
 }
 
+void test_hyper_and_meh() {
+    // Standalone HYPER keypress: &kp LS(LC(LA(LGUI))) -> 0x070700e3
+    auto kHyper = KeycodeDecoder::decode("key_press", 0x070700e3, 0);
+    TEST_ASSERT(kHyper.primaryLabel == "HYPER");
+    TEST_ASSERT(kHyper.secondaryLabel.isEmpty());
+    TEST_ASSERT(kHyper.category == "mod");
+
+    // Standalone MEH keypress: &kp LS(LC(LALT)) -> 0x030700e2
+    auto kMeh = KeycodeDecoder::decode("key_press", 0x030700e2, 0);
+    TEST_ASSERT(kMeh.primaryLabel == "MEH");
+    TEST_ASSERT(kMeh.secondaryLabel.isEmpty());
+    TEST_ASSERT(kMeh.category == "mod");
+
+    // Home-row mod MEH + G: &hml LS(LC(LALT)) G -> p1: 0x030700e2, p2: 0x0007000a
+    auto kHmlMeh = KeycodeDecoder::decode("hml", 0x030700e2, 0x0007000a);
+    TEST_ASSERT(kHmlMeh.primaryLabel == "G");
+    TEST_ASSERT(kHmlMeh.secondaryLabel == "MEH");
+    TEST_ASSERT(kHmlMeh.category == "mod");
+
+    // Home-row mod MEH + H: &hmr LS(LC(LALT)) H -> p1: 0x030700e2, p2: 0x0007000b
+    auto kHmrMeh = KeycodeDecoder::decode("hmr", 0x030700e2, 0x0007000b);
+    TEST_ASSERT(kHmrMeh.primaryLabel == "H");
+    TEST_ASSERT(kHmrMeh.secondaryLabel == "MEH");
+    TEST_ASSERT(kHmrMeh.category == "mod");
+
+    // Pure bitmask MEH and HYPER (MOD_LCTL | MOD_LSFT | MOD_LALT = 0x07, + MOD_LGUI = 0x0F)
+    TEST_ASSERT(KeycodeDecoder::modifierToLabel(0x07) == "MEH");
+    TEST_ASSERT(KeycodeDecoder::modifierToLabel(0x0F) == "HYPER");
+
+    // Single modifiers via keypress
+    auto kLgui = KeycodeDecoder::decode("key_press", 0x000700e3, 0);
+    TEST_ASSERT(kLgui.primaryLabel == "LGUI");
+    TEST_ASSERT(kLgui.category == "mod");
+
+    std::cout << "[PASS] Hyper and Meh decoding\n";
+}
+
 int main() {
     std::cout << "Running decoder tests...\n";
     test_alphas();
@@ -92,6 +129,7 @@ int main() {
     test_layer_taps();
     test_special_keys();
     test_sensors();
+    test_hyper_and_meh();
     std::cout << "All decoder tests passed successfully!\n";
     return 0;
 }
