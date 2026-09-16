@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
                 if (window->isVisible()) {
                     window->hide();
                 } else {
-                    window->show();
+                    window->showNormal();
                     window->raise();
                     window->requestActivate();
                 }

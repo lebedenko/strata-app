@@ -6,6 +6,7 @@
 
 #include "config/config_manager.hpp"
 #include "dbus/strata_dbus_client.hpp"
+#include "tray/status_notifier_item.hpp"
 
 namespace strata::tray {
 
@@ -26,6 +27,7 @@ signals:
 
 private slots:
     void onActivated(QSystemTrayIcon::ActivationReason reason);
+    void onContextMenuRequested(int x, int y);
     void updateTooltip();
 
 private:
@@ -33,6 +35,7 @@ private:
 
     dbus::StrataDBusClient *client_{nullptr};
     config::ConfigManager *configMgr_{nullptr};
+    StatusNotifierItem *sni_{nullptr};
     QSystemTrayIcon *trayIcon_{nullptr};
     QMenu *menu_{nullptr};
 };

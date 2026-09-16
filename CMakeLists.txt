@@ -52,6 +52,10 @@ qt_add_executable(strata
     src/model/keymap_model.cpp
     src/tray/tray_manager.hpp
     src/tray/tray_manager.cpp
+    src/tray/status_notifier_item.hpp
+    src/tray/status_notifier_item.cpp
+    src/tray/dbus_menu.hpp
+    src/tray/dbus_menu.cpp
     src/notification/notifier.hpp
     src/notification/notifier.cpp
 )
