@@ -49,18 +49,28 @@ QString KeycodeDecoder::modifierToLabel(uint32_t modCode) {
     }
 
     // Common two-modifier combinations
-    if (hasCtrl && hasAlt && !hasShift && !hasGui) return "C+A";
-    if (hasCtrl && hasShift && !hasAlt && !hasGui) return "C+S";
-    if (hasAlt && hasShift && !hasCtrl && !hasGui) return "A+S";
-    if (hasGui && hasCtrl && !hasShift && !hasAlt) return "G+C";
-    if (hasGui && hasAlt && !hasShift && !hasCtrl) return "G+A";
-    if (hasGui && hasShift && !hasCtrl && !hasAlt) return "G+S";
+    if (hasCtrl && hasAlt && !hasShift && !hasGui)
+        return "C+A";
+    if (hasCtrl && hasShift && !hasAlt && !hasGui)
+        return "C+S";
+    if (hasAlt && hasShift && !hasCtrl && !hasGui)
+        return "A+S";
+    if (hasGui && hasCtrl && !hasShift && !hasAlt)
+        return "G+C";
+    if (hasGui && hasAlt && !hasShift && !hasCtrl)
+        return "G+A";
+    if (hasGui && hasShift && !hasCtrl && !hasAlt)
+        return "G+S";
 
     // Single modifiers
-    if (hasCtrl) return "CTRL";
-    if (hasShift) return "SHIFT";
-    if (hasAlt) return "ALT";
-    if (hasGui) return "GUI";
+    if (hasCtrl)
+        return "CTRL";
+    if (hasShift)
+        return "SHIFT";
+    if (hasAlt)
+        return "ALT";
+    if (hasGui)
+        return "GUI";
 
     return "MOD";
 }
@@ -271,15 +281,24 @@ QString KeycodeDecoder::hidUsageToLabel(uint32_t code) {
         }
 
         switch (usage) {
-        case 0xE0: return "LCTRL";
-        case 0xE1: return "LSHIFT";
-        case 0xE2: return "LALT";
-        case 0xE3: return "LGUI";
-        case 0xE4: return "RCTRL";
-        case 0xE5: return "RSHIFT";
-        case 0xE6: return "RALT";
-        case 0xE7: return "RGUI";
-        default: return QString("0x%1").arg(code, 0, 16);
+        case 0xE0:
+            return "LCTRL";
+        case 0xE1:
+            return "LSHIFT";
+        case 0xE2:
+            return "LALT";
+        case 0xE3:
+            return "LGUI";
+        case 0xE4:
+            return "RCTRL";
+        case 0xE5:
+            return "RSHIFT";
+        case 0xE6:
+            return "RALT";
+        case 0xE7:
+            return "RGUI";
+        default:
+            return QString("0x%1").arg(code, 0, 16);
         }
     }
     default:
@@ -292,8 +311,10 @@ QString KeycodeDecoder::hidUsageToLabel(uint32_t code) {
                 bool hasShift = (modMask & (MOD_LSFT | MOD_RSFT)) != 0;
                 bool hasAlt = (modMask & (MOD_LALT | MOD_RALT)) != 0;
                 bool hasGui = (modMask & (MOD_LGUI | MOD_RGUI)) != 0;
-                if (hasCtrl && hasShift && hasAlt && hasGui) return "HYPER";
-                if (hasCtrl && hasShift && hasAlt && !hasGui) return "MEH";
+                if (hasCtrl && hasShift && hasAlt && hasGui)
+                    return "HYPER";
+                if (hasCtrl && hasShift && hasAlt && !hasGui)
+                    return "MEH";
             }
         }
         return QString("0x%1").arg(code, 0, 16);
@@ -306,11 +327,10 @@ DecodedKey KeycodeDecoder::decode(const QString &behavior, uint32_t param1, uint
 
     if (behavior == "key_press" || behavior == "kp") {
         k.primaryLabel = hidUsageToLabel(param1);
-        if (k.primaryLabel == "HYPER" || k.primaryLabel == "MEH" ||
-            k.primaryLabel == "LCTRL" || k.primaryLabel == "RCTRL" ||
-            k.primaryLabel == "LSHIFT" || k.primaryLabel == "RSHIFT" ||
-            k.primaryLabel == "LALT" || k.primaryLabel == "RALT" ||
-            k.primaryLabel == "LGUI" || k.primaryLabel == "RGUI") {
+        if (k.primaryLabel == "HYPER" || k.primaryLabel == "MEH" || k.primaryLabel == "LCTRL" ||
+            k.primaryLabel == "RCTRL" || k.primaryLabel == "LSHIFT" || k.primaryLabel == "RSHIFT" ||
+            k.primaryLabel == "LALT" || k.primaryLabel == "RALT" || k.primaryLabel == "LGUI" ||
+            k.primaryLabel == "RGUI") {
             k.category = "mod";
         } else if (k.primaryLabel.length() == 1 && k.primaryLabel[0].isLetter()) {
             k.category = "alpha";
@@ -333,7 +353,8 @@ DecodedKey KeycodeDecoder::decode(const QString &behavior, uint32_t param1, uint
         k.secondaryLabel = modifierToLabel(param1);
         k.category = "mod";
         if (k.secondaryLabel == "HYPER") {
-            k.tooltip = QString("Home-Row Mod: HYPER [Ctrl+Shift+Alt+Gui] (Tap: %1)").arg(k.primaryLabel);
+            k.tooltip =
+                QString("Home-Row Mod: HYPER [Ctrl+Shift+Alt+Gui] (Tap: %1)").arg(k.primaryLabel);
         } else if (k.secondaryLabel == "MEH") {
             k.tooltip = QString("Home-Row Mod: MEH [Ctrl+Shift+Alt] (Tap: %1)").arg(k.primaryLabel);
         } else {
@@ -413,7 +434,8 @@ DecodedKey KeycodeDecoder::decode(const QString &behavior, uint32_t param1, uint
     return k;
 }
 
-DecodedSensor KeycodeDecoder::decodeSensor(const QString &behavior, uint32_t param1, uint32_t param2) {
+DecodedSensor KeycodeDecoder::decodeSensor(const QString &behavior, uint32_t param1,
+                                           uint32_t param2) {
     DecodedSensor s;
     s.behavior = behavior;
 

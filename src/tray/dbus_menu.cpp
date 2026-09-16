@@ -15,8 +15,7 @@ bool DBusMenuService::AboutToShow(int id) {
     return false;
 }
 
-void DBusMenuService::GetLayout(int parentId, int recursionDepth,
-                                const QStringList &propertyNames,
+void DBusMenuService::GetLayout(int parentId, int recursionDepth, const QStringList &propertyNames,
                                 const QDBusMessage &message) {
     Q_UNUSED(parentId);
     Q_UNUSED(recursionDepth);

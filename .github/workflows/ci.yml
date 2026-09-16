@@ -15,6 +15,7 @@ jobs:
     - name: Install dependencies
       run: |
         pacman -Syu --noconfirm base-devel cmake ninja git qt6-base qt6-declarative qt6-svg tomlplusplus go-task clang
+        ln -sf /usr/bin/go-task /usr/local/bin/task
 
     - uses: actions/checkout@v4
 

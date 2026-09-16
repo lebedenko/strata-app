@@ -149,8 +149,8 @@ bool StatusNotifierItem::registerItem() {
         return false;
     }
 
-    serviceName_ = QStringLiteral("org.kde.StatusNotifierItem-%1-1")
-                       .arg(QCoreApplication::applicationPid());
+    serviceName_ =
+        QStringLiteral("org.kde.StatusNotifierItem-%1-1").arg(QCoreApplication::applicationPid());
     if (!bus.registerService(serviceName_)) {
         serviceName_ = QStringLiteral("org.kde.StatusNotifierItem-%1-%2")
                            .arg(QCoreApplication::applicationPid())
@@ -178,13 +178,11 @@ bool StatusNotifierItem::registerItem() {
     registered_ = true;
 
     if (!watcherTracker_) {
-        watcherTracker_ = new QDBusServiceWatcher(
-            QStringLiteral("org.kde.StatusNotifierWatcher"),
-            bus,
-            QDBusServiceWatcher::WatchForRegistration,
-            this);
-        connect(watcherTracker_, &QDBusServiceWatcher::serviceRegistered,
-                this, &StatusNotifierItem::onWatcherRegistered);
+        watcherTracker_ =
+            new QDBusServiceWatcher(QStringLiteral("org.kde.StatusNotifierWatcher"), bus,
+                                    QDBusServiceWatcher::WatchForRegistration, this);
+        connect(watcherTracker_, &QDBusServiceWatcher::serviceRegistered, this,
+                &StatusNotifierItem::onWatcherRegistered);
     }
 
     registerWithWatcher();
@@ -204,14 +202,13 @@ void StatusNotifierItem::unregisterItem() {
 
 void StatusNotifierItem::registerWithWatcher() {
     auto bus = QDBusConnection::sessionBus();
-    QDBusInterface watcher(
-        QStringLiteral("org.kde.StatusNotifierWatcher"),
-        QStringLiteral("/StatusNotifierWatcher"),
-        QStringLiteral("org.kde.StatusNotifierWatcher"),
-        bus);
+    QDBusInterface watcher(QStringLiteral("org.kde.StatusNotifierWatcher"),
+                           QStringLiteral("/StatusNotifierWatcher"),
+                           QStringLiteral("org.kde.StatusNotifierWatcher"), bus);
 
     if (watcher.isValid()) {
-        qCInfo(lcSni) << "Registering StatusNotifierItem" << serviceName_ << "with StatusNotifierWatcher";
+        qCInfo(lcSni) << "Registering StatusNotifierItem" << serviceName_
+                      << "with StatusNotifierWatcher";
         watcher.asyncCall(QStringLiteral("RegisterStatusNotifierItem"), serviceName_);
     } else {
         qCInfo(lcSni) << "StatusNotifierWatcher is not currently registered; will wait for it";

@@ -73,7 +73,9 @@ public:
     [[nodiscard]] int windowId() const { return 0; }
     [[nodiscard]] QString iconThemePath() const;
     [[nodiscard]] bool itemIsMenu() const { return false; }
-    [[nodiscard]] QDBusObjectPath menu() const { return QDBusObjectPath(QStringLiteral("/MenuBar")); }
+    [[nodiscard]] QDBusObjectPath menu() const {
+        return QDBusObjectPath(QStringLiteral("/MenuBar"));
+    }
     [[nodiscard]] QString iconName() const { return QStringLiteral("strata"); }
     [[nodiscard]] SniIconPixmapList iconPixmap() const { return iconPixmaps_; }
     [[nodiscard]] QString overlayIconName() const { return {}; }
