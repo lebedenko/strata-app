@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="layerGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="layerGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="layerGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c084fc"/>
+      <stop offset="100%" stop-color="#9333ea"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded plate -->
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="#18181b" filter="url(#shadow)"/>
+  
+  <!-- Strata / Stacked keyboard layers -->
+  <!-- Bottom layer -->
+  <path d="M 28 82 L 64 98 L 100 82 L 64 68 Z" fill="url(#layerGrad3)" opacity="0.6"/>
+  <!-- Middle layer -->
+  <path d="M 28 62 L 64 78 L 100 62 L 64 48 Z" fill="url(#layerGrad2)" opacity="0.8"/>
+  <!-- Top layer (active) -->
+  <path d="M 28 42 L 64 58 L 100 42 L 64 28 Z" fill="url(#layerGrad1)" filter="url(#shadow)"/>
+  
+  <!-- Subtle accent dot on top center key -->
+  <circle cx="64" cy="43" r="3" fill="#ffffff" opacity="0.9"/>
+</svg>

@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+
+    steps:
+    - name: Install dependencies
+      run: |
+        pacman -Syu --noconfirm base-devel cmake ninja git qt6-base qt6-declarative qt6-svg tomlplusplus go-task clang
+
+    - uses: actions/checkout@v4
+
+    - name: Verify Code Formatting
+      run: task format-check
+
+    - name: Build
+      run: task build
+
+    - name: Run Tests
+      run: task test
