@@ -7,7 +7,7 @@ Item {
     required property var keymapModel
     property bool showPositions: false
 
-    implicitWidth: 920
+    implicitWidth: 960
     implicitHeight: 340
 
     // Helper function to fetch key properties reactively
@@ -21,10 +21,10 @@ Item {
     // Left Half
     Item {
         id: leftHalf
-        width: 360
+        width: 350
         height: 280
         anchors.left: parent.left
-        anchors.leftMargin: 20
+        anchors.leftMargin: 10
         anchors.verticalCenter: parent.verticalCenter
 
         // Matrix columns (6 cols x 3 rows)
@@ -123,106 +123,125 @@ Item {
         }
     }
 
-    // Center 5-way Navigation Cluster (Eyelash Corne Joystick / Center Keys)
-    Item {
-        id: centerNav
-        width: 140
-        height: 180
+    // Center Navigation & Control Region: Rotary Knob (Left) + 5-Way Joystick (Right)
+    Row {
+        id: centerControls
         anchors.centerIn: parent
-        anchors.verticalCenterOffset: -20
+        anchors.verticalCenterOffset: -10
+        spacing: 12
 
-        // UP
-        KeyCap {
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: parent.top
-            width: 44
-            height: 44
-            position: 6
-            primaryText: keyProp(6, "primaryLabel", "UP")
-            secondaryText: keyProp(6, "secondaryLabel", "")
-            tooltipText: keyProp(6, "tooltip", "")
-            category: "nav"
+        // Left Half Rotary Encoder Knob
+        RotaryKnob {
+            id: leftKnob
+            keymapModel: root.keymapModel
+            sensorIndex: 0
             showPosition: root.showPositions
-        }
-
-        // LEFT
-        KeyCap {
             anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
-            width: 44
-            height: 44
-            position: 19
-            primaryText: keyProp(19, "primaryLabel", "LFT")
-            secondaryText: keyProp(19, "secondaryLabel", "")
-            tooltipText: keyProp(19, "tooltip", "")
-            category: "nav"
-            showPosition: root.showPositions
         }
 
-        // CENTER / ENTER
-        KeyCap {
-            anchors.centerIn: parent
-            width: 44
-            height: 44
-            position: 20
-            primaryText: keyProp(20, "primaryLabel", "OK")
-            secondaryText: keyProp(20, "secondaryLabel", "")
-            tooltipText: keyProp(20, "tooltip", "")
-            category: "nav"
-            showPosition: root.showPositions
-        }
-
-        // RIGHT
-        KeyCap {
+        // Right Half 5-Way Navigation Switch
+        Item {
+            id: joystickCluster
+            width: 114
+            height: 124
             anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-            width: 44
-            height: 44
-            position: 21
-            primaryText: keyProp(21, "primaryLabel", "RGT")
-            secondaryText: keyProp(21, "secondaryLabel", "")
-            tooltipText: keyProp(21, "tooltip", "")
-            category: "nav"
-            showPosition: root.showPositions
-        }
 
-        // DOWN
-        KeyCap {
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: parent.bottom
-            width: 44
-            height: 44
-            position: 35
-            primaryText: keyProp(35, "primaryLabel", "DWN")
-            secondaryText: keyProp(35, "secondaryLabel", "")
-            tooltipText: keyProp(35, "tooltip", "")
-            category: "nav"
-            showPosition: root.showPositions
-        }
+            Text {
+                anchors.top: parent.top
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: qsTr("JOYSTICK")
+                font.pointSize: 6.5
+                font.bold: true
+                font.letterSpacing: 1.5
+                color: palette.dark.hslLightness > 0.5 ? "#64748b" : "#a1a1aa"
+            }
 
-        // MUTE (Small center badge below)
-        KeyCap {
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: centerNav.bottom
-            anchors.topMargin: 12
-            width: 48
-            height: 32
-            position: 34
-            primaryText: keyProp(34, "primaryLabel", "MUTE")
-            secondaryText: keyProp(34, "secondaryLabel", "")
-            tooltipText: keyProp(34, "tooltip", "")
-            category: "media"
-            showPosition: root.showPositions
+            Item {
+                id: dpad
+                width: 106
+                height: 106
+                anchors.bottom: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                // UP
+                KeyCap {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.top
+                    width: 34
+                    height: 34
+                    position: 6
+                    primaryText: keyProp(6, "primaryLabel", "UP")
+                    secondaryText: keyProp(6, "secondaryLabel", "")
+                    tooltipText: keyProp(6, "tooltip", "")
+                    category: "nav"
+                    showPosition: root.showPositions
+                }
+
+                // LEFT
+                KeyCap {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    width: 34
+                    height: 34
+                    position: 19
+                    primaryText: keyProp(19, "primaryLabel", "LFT")
+                    secondaryText: keyProp(19, "secondaryLabel", "")
+                    tooltipText: keyProp(19, "tooltip", "")
+                    category: "nav"
+                    showPosition: root.showPositions
+                }
+
+                // CENTER / ENTER
+                KeyCap {
+                    anchors.centerIn: parent
+                    width: 34
+                    height: 34
+                    position: 20
+                    primaryText: keyProp(20, "primaryLabel", "OK")
+                    secondaryText: keyProp(20, "secondaryLabel", "")
+                    tooltipText: keyProp(20, "tooltip", "")
+                    category: "nav"
+                    showPosition: root.showPositions
+                }
+
+                // RIGHT
+                KeyCap {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
+                    width: 34
+                    height: 34
+                    position: 21
+                    primaryText: keyProp(21, "primaryLabel", "RGT")
+                    secondaryText: keyProp(21, "secondaryLabel", "")
+                    tooltipText: keyProp(21, "tooltip", "")
+                    category: "nav"
+                    showPosition: root.showPositions
+                }
+
+                // DOWN
+                KeyCap {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: parent.bottom
+                    width: 34
+                    height: 34
+                    position: 35
+                    primaryText: keyProp(35, "primaryLabel", "DWN")
+                    secondaryText: keyProp(35, "secondaryLabel", "")
+                    tooltipText: keyProp(35, "tooltip", "")
+                    category: "nav"
+                    showPosition: root.showPositions
+                }
+            }
         }
     }
 
     // Right Half
     Item {
         id: rightHalf
-        width: 360
+        width: 350
         height: 280
         anchors.right: parent.right
-        anchors.rightMargin: 20
+        anchors.rightMargin: 10
         anchors.verticalCenter: parent.verticalCenter
 
         // Matrix columns (6 cols x 3 rows)

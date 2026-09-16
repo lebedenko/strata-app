@@ -19,6 +19,15 @@ struct KeyItem {
     uint32_t param2{0};
 };
 
+struct SensorItem {
+    int sensorIndex{0};
+    QString behavior;
+    QString cwLabel;
+    QString ccwLabel;
+    QString tooltip;
+    QString category;
+};
+
 class KeymapModel : public QAbstractListModel {
     Q_OBJECT
 
@@ -52,12 +61,14 @@ public:
     [[nodiscard]] bool isLoading() const noexcept { return isLoading_; }
 
     Q_INVOKABLE QVariantMap getKeyData(int position) const;
+    Q_INVOKABLE QVariantMap getSensorData(int sensorIndex) const;
     Q_INVOKABLE void reload();
 
 signals:
     void currentLayerChanged();
     void totalKeysChanged();
     void isLoadingChanged();
+    void sensorDataChanged();
 
 private slots:
     void onLayerBindingsLoaded(int layer, int count);
@@ -70,6 +81,7 @@ private:
     int currentLayer_{0};
     bool isLoading_{false};
     QVector<KeyItem> keys_;
+    QVector<SensorItem> sensors_;
 };
 
 } // namespace strata::model

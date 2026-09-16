@@ -66,6 +66,7 @@ qt_add_qml_module(strata
     QML_FILES
         qml/Main.qml
         qml/components/KeyCap.qml
+        qml/components/RotaryKnob.qml
         qml/components/SplitKeyboard.qml
         qml/components/LayerTabBar.qml
         qml/components/StatusBar.qml

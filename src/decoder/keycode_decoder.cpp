@@ -329,4 +329,44 @@ DecodedKey KeycodeDecoder::decode(const QString &behavior, uint32_t param1, uint
     return k;
 }
 
+DecodedSensor KeycodeDecoder::decodeSensor(const QString &behavior, uint32_t param1, uint32_t param2) {
+    DecodedSensor s;
+    s.behavior = behavior;
+
+    if (behavior == "inc_dec_kp") {
+        s.cwLabel = hidUsageToLabel(param1);
+        s.ccwLabel = hidUsageToLabel(param2);
+        s.category = "media";
+        s.tooltip = QString("Encoder: CW → %1, CCW → %2").arg(s.cwLabel, s.ccwLabel);
+        return s;
+    }
+
+    if (behavior == "scroll_encoder" || behavior.contains("scroll")) {
+        s.cwLabel = "SCRL DN";
+        s.ccwLabel = "SCRL UP";
+        s.category = "nav";
+        s.tooltip = "Encoder: CW → Scroll Down, CCW → Scroll Up";
+        return s;
+    }
+
+    if (behavior == "rgb_encoder" || behavior.contains("rgb")) {
+        s.cwLabel = "RGB BRI";
+        s.ccwLabel = "RGB BRD";
+        s.category = "misc";
+        s.tooltip = "Encoder: CW → RGB Brightness +, CCW → RGB Brightness -";
+        return s;
+    }
+
+    if (param1 != 0 || param2 != 0) {
+        s.cwLabel = hidUsageToLabel(param1);
+        s.ccwLabel = hidUsageToLabel(param2);
+    } else {
+        s.cwLabel = "CW";
+        s.ccwLabel = "CCW";
+    }
+    s.category = "misc";
+    s.tooltip = QString("Encoder %1").arg(behavior);
+    return s;
+}
+
 } // namespace strata::decoder

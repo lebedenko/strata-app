@@ -67,12 +67,31 @@ void test_special_keys() {
     std::cout << "[PASS] Special key decoding\n";
 }
 
+void test_sensors() {
+    auto sVol = KeycodeDecoder::decodeSensor("inc_dec_kp", 0x000c00e9, 0x000c00ea);
+    TEST_ASSERT(sVol.cwLabel == "VOL+");
+    TEST_ASSERT(sVol.ccwLabel == "VOL-");
+    TEST_ASSERT(sVol.category == "media");
+
+    auto sScroll = KeycodeDecoder::decodeSensor("scroll_encoder", 0, 0);
+    TEST_ASSERT(sScroll.cwLabel == "SCRL DN");
+    TEST_ASSERT(sScroll.ccwLabel == "SCRL UP");
+    TEST_ASSERT(sScroll.category == "nav");
+
+    auto sRgb = KeycodeDecoder::decodeSensor("rgb_encoder", 0, 0);
+    TEST_ASSERT(sRgb.cwLabel == "RGB BRI");
+    TEST_ASSERT(sRgb.ccwLabel == "RGB BRD");
+
+    std::cout << "[PASS] Sensor decoding\n";
+}
+
 int main() {
     std::cout << "Running decoder tests...\n";
     test_alphas();
     test_home_row_mods();
     test_layer_taps();
     test_special_keys();
+    test_sensors();
     std::cout << "All decoder tests passed successfully!\n";
     return 0;
 }
