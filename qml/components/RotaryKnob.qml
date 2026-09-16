@@ -12,7 +12,11 @@ Item {
     implicitHeight: 120
 
     // Fetch sensor data reactively
-    readonly property var sensorData: keymapModel ? keymapModel.getSensorData(sensorIndex) : null
+    readonly property var sensorData: {
+        if (!keymapModel) return null;
+        var _rev = keymapModel.revision;
+        return keymapModel.getSensorData(sensorIndex);
+    }
     readonly property string cwLabel: sensorData ? sensorData.cwLabel : "CW"
     readonly property string ccwLabel: sensorData ? sensorData.ccwLabel : "CCW"
     readonly property string pressLabel: sensorData ? sensorData.pressLabel : "PUSH"

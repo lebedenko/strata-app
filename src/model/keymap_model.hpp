@@ -34,6 +34,7 @@ class KeymapModel : public QAbstractListModel {
     Q_PROPERTY(int currentLayer READ currentLayer WRITE setCurrentLayer NOTIFY currentLayerChanged)
     Q_PROPERTY(int totalKeys READ totalKeys NOTIFY totalKeysChanged)
     Q_PROPERTY(bool isLoading READ isLoading NOTIFY isLoadingChanged)
+    Q_PROPERTY(quint64 revision READ revision NOTIFY revisionChanged)
 
 public:
     enum KeyRoles {
@@ -59,6 +60,7 @@ public:
 
     [[nodiscard]] int totalKeys() const noexcept { return static_cast<int>(keys_.size()); }
     [[nodiscard]] bool isLoading() const noexcept { return isLoading_; }
+    [[nodiscard]] quint64 revision() const noexcept { return revision_; }
 
     Q_INVOKABLE QVariantMap getKeyData(int position) const;
     Q_INVOKABLE QVariantMap getSensorData(int sensorIndex) const;
@@ -69,6 +71,7 @@ signals:
     void totalKeysChanged();
     void isLoadingChanged();
     void sensorDataChanged();
+    void revisionChanged();
 
 private slots:
     void onLayerBindingsLoaded(int layer, int count);
@@ -80,6 +83,7 @@ private:
     dbus::StrataDBusClient *client_{nullptr};
     int currentLayer_{0};
     bool isLoading_{false};
+    quint64 revision_{0};
     QVector<KeyItem> keys_;
     QVector<SensorItem> sensors_;
 };

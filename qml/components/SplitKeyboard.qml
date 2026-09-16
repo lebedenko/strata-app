@@ -13,6 +13,7 @@ Item {
     // Helper function to fetch key properties reactively
     function keyProp(pos, prop, defaultVal) {
         if (!keymapModel) return defaultVal;
+        var _rev = keymapModel.revision;
         var data = keymapModel.getKeyData(pos);
         if (data && data[prop] !== undefined) return data[prop];
         return defaultVal;

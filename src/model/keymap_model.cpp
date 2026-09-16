@@ -13,6 +13,9 @@ KeymapModel::KeymapModel(dbus::StrataDBusClient *client, QObject *parent)
         connect(client_, &dbus::StrataDBusClient::selectedLayerChanged, this,
                 [this]() { setCurrentLayer(client_->selectedLayerIndex()); });
 
+        connect(client_, &dbus::StrataDBusClient::activeLayerChanged, this,
+                [this](int index, const QString &, uint) { setCurrentLayer(index); });
+
         connect(client_, &dbus::StrataDBusClient::layerBindingsLoaded, this,
                 &KeymapModel::onLayerBindingsLoaded);
 
@@ -269,6 +272,8 @@ void KeymapModel::populateKeys(int layer) {
     sensors_ = std::move(newSensors);
     endResetModel();
 
+    ++revision_;
+    emit revisionChanged();
     isLoading_ = false;
     emit isLoadingChanged();
     emit totalKeysChanged();

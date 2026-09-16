@@ -83,6 +83,7 @@ void StrataDBusClient::parseStatusJson(const QString &jsonStr) {
         activeLayerIndex_ = active.value("index").toInt(0);
         activeLayerName_ = active.value("name").toString("unknown");
         activeLayerMask_ = static_cast<uint>(active.value("mask").toInteger(0));
+        setSelectedLayerIndex(activeLayerIndex_);
     }
 
     emit statusChanged();
@@ -168,6 +169,8 @@ void StrataDBusClient::onLayerChangedSignal(uint index, const QString &name, uin
 
     emit activeLayerChanged(activeLayerIndex_, activeLayerName_, activeLayerMask_);
     emit layersChanged();
+
+    setSelectedLayerIndex(activeLayerIndex_);
 }
 
 void StrataDBusClient::onDeviceConnectedSignal(const QString &name, const QString &node,
