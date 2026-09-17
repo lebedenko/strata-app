@@ -1,0 +1,66 @@
+{
+  "id": "eyelash_corne",
+  "name": "Eyelash Corne",
+  "description": "3x6+3 Split keyboard with rotary encoder and 5-way joystick",
+  "totalKeys": 48,
+  "width": 960,
+  "height": 340,
+  "leftHalf": {
+    "width": 350,
+    "height": 280,
+    "columns": [
+      { "offsetY": 12, "keys": [0, 13, 28] },
+      { "offsetY": 6,  "keys": [1, 14, 29] },
+      { "offsetY": 0,  "keys": [2, 15, 30] },
+      { "offsetY": -6, "keys": [3, 16, 31] },
+      { "offsetY": 0,  "keys": [4, 17, 32] },
+      { "offsetY": 4,  "keys": [5, 18, 33] }
+    ],
+    "thumbCluster": [
+      { "pos": 42, "rotation": -8 },
+      { "pos": 43, "rotation": -4 },
+      { "pos": 44, "rotation": 0 }
+    ]
+  },
+  "rightHalf": {
+    "width": 350,
+    "height": 280,
+    "columns": [
+      { "offsetY": 4,  "keys": [7, 22, 36] },
+      { "offsetY": 0,  "keys": [8, 23, 37] },
+      { "offsetY": -6, "keys": [9, 24, 38] },
+      { "offsetY": 0,  "keys": [10, 25, 39] },
+      { "offsetY": 6,  "keys": [11, 26, 40] },
+      { "offsetY": 12, "keys": [12, 27, 41] }
+    ],
+    "thumbCluster": [
+      { "pos": 45, "rotation": 0 },
+      { "pos": 46, "rotation": 4 },
+      { "pos": 47, "rotation": 8 }
+    ]
+  },
+  "centerControls": [
+    {
+      "type": "rotary_knob",
+      "sensorIndex": 0,
+      "pressPos": 34
+    },
+    {
+      "type": "joystick_5way",
+      "upPos": 6,
+      "leftPos": 19,
+      "centerPos": 20,
+      "rightPos": 21,
+      "downPos": 35
+    }
+  ],
+  "sensorDefaults": {
+    "0": {
+      "0": { "behavior": "inc_dec_kp", "cwLabel": "VOL+", "ccwLabel": "VOL-", "tooltip": "Volume Control (CW: Vol+, CCW: Vol-)", "category": "media" },
+      "1": { "behavior": "scroll_encoder", "cwLabel": "SCRL DN", "ccwLabel": "SCRL UP", "tooltip": "Mouse Scroll (CW: Down, CCW: Up)", "category": "nav" },
+      "2": { "behavior": "scroll_encoder", "cwLabel": "SCRL DN", "ccwLabel": "SCRL UP", "tooltip": "Mouse Scroll (CW: Down, CCW: Up)", "category": "nav" },
+      "3": { "behavior": "rgb_encoder", "cwLabel": "RGB BRI", "ccwLabel": "RGB BRD", "tooltip": "RGB Brightness (CW: Bri+, CCW: Bri-)", "category": "misc" },
+      "default": { "behavior": "scroll_encoder", "cwLabel": "SCRL DN", "ccwLabel": "SCRL UP", "tooltip": "Mouse Scroll", "category": "nav" }
+    }
+  }
+}

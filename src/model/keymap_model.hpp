@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QAbstractListModel>
+#include <QJsonObject>
+#include <QVariantMap>
 #include <QVector>
 
 #include "dbus/strata_dbus_client.hpp"
@@ -35,6 +37,8 @@ class KeymapModel : public QAbstractListModel {
     Q_PROPERTY(int totalKeys READ totalKeys NOTIFY totalKeysChanged)
     Q_PROPERTY(bool isLoading READ isLoading NOTIFY isLoadingChanged)
     Q_PROPERTY(quint64 revision READ revision NOTIFY revisionChanged)
+    Q_PROPERTY(QString layoutId READ layoutId WRITE setLayoutId NOTIFY layoutIdChanged)
+    Q_PROPERTY(QVariantMap layoutData READ layoutData NOTIFY layoutDataChanged)
 
 public:
     enum KeyRoles {
@@ -62,9 +66,15 @@ public:
     [[nodiscard]] bool isLoading() const noexcept { return isLoading_; }
     [[nodiscard]] quint64 revision() const noexcept { return revision_; }
 
+    [[nodiscard]] QString layoutId() const noexcept { return layoutId_; }
+    void setLayoutId(const QString &id);
+
+    [[nodiscard]] const QVariantMap &layoutData() const noexcept { return layoutData_; }
+
     Q_INVOKABLE QVariantMap getKeyData(int position) const;
-    Q_INVOKABLE QVariantMap getSensorData(int sensorIndex) const;
+    Q_INVOKABLE QVariantMap getSensorData(int sensorIndex, int pressPos = -1) const;
     Q_INVOKABLE void reload();
+    Q_INVOKABLE bool loadLayout(const QString &layoutId);
 
 signals:
     void currentLayerChanged();
@@ -72,18 +82,25 @@ signals:
     void isLoadingChanged();
     void sensorDataChanged();
     void revisionChanged();
+    void layoutIdChanged();
+    void layoutDataChanged();
 
 private slots:
     void onLayerBindingsLoaded(int layer, int count);
     void onKeymapLoaded(const QString &buildId, const QString &source, uint layerCount);
+    void onDeviceStateChanged();
 
 private:
     void populateKeys(int layer);
+    void updateLayoutFromDevice();
 
     dbus::StrataDBusClient *client_{nullptr};
     int currentLayer_{0};
     bool isLoading_{false};
     quint64 revision_{0};
+    QString layoutId_;
+    QJsonObject layoutJson_;
+    QVariantMap layoutData_;
     QVector<KeyItem> keys_;
     QVector<SensorItem> sensors_;
 };

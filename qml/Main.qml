@@ -61,7 +61,31 @@ ApplicationWindow {
             anchors.right: parent.right
             anchors.rightMargin: 16
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 16
+            spacing: 12
+
+            ComboBox {
+                id: deviceSelector
+                visible: strataDBusClient && strataDBusClient.availableDevices && strataDBusClient.availableDevices.length > 1
+                anchors.verticalCenter: parent.verticalCenter
+                model: strataDBusClient ? strataDBusClient.availableDevices : []
+                textRole: "name"
+                font.pointSize: 9
+                implicitHeight: 28
+
+                currentIndex: {
+                    if (!strataDBusClient || !strataDBusClient.availableDevices) return 0;
+                    for (var i = 0; i < strataDBusClient.availableDevices.length; ++i) {
+                        if (strataDBusClient.availableDevices[i].id === strataDBusClient.deviceId) return i;
+                    }
+                    return 0;
+                }
+
+                onActivated: function(index) {
+                    if (strataDBusClient && strataDBusClient.availableDevices && index >= 0 && index < strataDBusClient.availableDevices.length) {
+                        strataDBusClient.selectDevice(strataDBusClient.availableDevices[index].id);
+                    }
+                }
+            }
 
             CheckBox {
                 text: qsTr("Show Key IDs")

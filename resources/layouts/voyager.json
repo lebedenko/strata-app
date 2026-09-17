@@ -1,0 +1,42 @@
+{
+  "id": "voyager",
+  "name": "ZSA Voyager",
+  "description": "4x6+2 Split ergonomic keyboard (52 keys)",
+  "totalKeys": 52,
+  "width": 960,
+  "height": 360,
+  "leftHalf": {
+    "width": 380,
+    "height": 320,
+    "columns": [
+      { "offsetY": 12, "keys": [0, 6, 12, 18] },
+      { "offsetY": 6,  "keys": [1, 7, 13, 19] },
+      { "offsetY": 0,  "keys": [2, 8, 14, 20] },
+      { "offsetY": -6, "keys": [3, 9, 15, 21] },
+      { "offsetY": 0,  "keys": [4, 10, 16, 22] },
+      { "offsetY": 6,  "keys": [5, 11, 17, 23] }
+    ],
+    "thumbCluster": [
+      { "pos": 24, "rotation": -6 },
+      { "pos": 25, "rotation": 0 }
+    ]
+  },
+  "rightHalf": {
+    "width": 380,
+    "height": 320,
+    "columns": [
+      { "offsetY": 6,  "keys": [26, 32, 38, 44] },
+      { "offsetY": 0,  "keys": [27, 33, 39, 45] },
+      { "offsetY": -6, "keys": [28, 34, 40, 46] },
+      { "offsetY": 0,  "keys": [29, 35, 41, 47] },
+      { "offsetY": 6,  "keys": [30, 36, 42, 48] },
+      { "offsetY": 12, "keys": [31, 37, 43, 49] }
+    ],
+    "thumbCluster": [
+      { "pos": 50, "rotation": 0 },
+      { "pos": 51, "rotation": 6 }
+    ]
+  },
+  "centerControls": [],
+  "sensorDefaults": {}
+}

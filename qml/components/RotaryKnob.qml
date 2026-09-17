@@ -6,6 +6,7 @@ Item {
 
     required property var keymapModel
     property int sensorIndex: 0
+    property int pressKeyPos: -1
     property bool showPosition: false
 
     implicitWidth: 120
@@ -15,8 +16,9 @@ Item {
     readonly property var sensorData: {
         if (!keymapModel) return null;
         var _rev = keymapModel.revision;
-        return keymapModel.getSensorData(sensorIndex);
+        return keymapModel.getSensorData(sensorIndex, pressKeyPos);
     }
+    readonly property int resolvedPressPos: sensorData && sensorData.pressKeyPos !== undefined ? sensorData.pressKeyPos : (pressKeyPos >= 0 ? pressKeyPos : 34)
     readonly property string cwLabel: sensorData ? sensorData.cwLabel : "CW"
     readonly property string ccwLabel: sensorData ? sensorData.ccwLabel : "CCW"
     readonly property string pressLabel: sensorData ? sensorData.pressLabel : "PUSH"
@@ -147,7 +149,7 @@ Item {
 
                 Label {
                     visible: root.showPosition
-                    text: "#34"
+                    text: "#" + root.resolvedPressPos
                     font.pointSize: 5.5
                     color: subTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -179,7 +181,7 @@ Item {
         visible: hoverArea.containsMouse
         delay: 400
         timeout: 5000
-        text: qsTr("Rotary Encoder:\n• Push (Key 34): %1\n• Turn CW: %2\n• Turn CCW: %3\n(%4)").arg(root.pressLabel).arg(root.cwLabel).arg(root.ccwLabel).arg(root.tooltipText)
+        text: qsTr("Rotary Encoder:\n• Push (Key %1): %2\n• Turn CW: %3\n• Turn CCW: %4\n(%5)").arg(root.resolvedPressPos).arg(root.pressLabel).arg(root.cwLabel).arg(root.ccwLabel).arg(root.tooltipText)
     }
 
     MouseArea {

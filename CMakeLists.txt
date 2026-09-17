@@ -72,6 +72,8 @@ qt_add_qml_module(strata
         qml/components/StatusBar.qml
     RESOURCES
         desktop/strata.svg
+        resources/layouts/eyelash_corne.json
+        resources/layouts/voyager.json
 )
 
 target_include_directories(strata PRIVATE
@@ -117,6 +119,21 @@ target_link_libraries(test_config PRIVATE
 )
 add_test(NAME test_config COMMAND test_config)
 
+add_executable(test_layout_model
+    tests/test_layout_model.cpp
+    src/model/keymap_model.cpp
+    src/decoder/keycode_decoder.cpp
+    src/dbus/strata_dbus_client.cpp
+)
+target_include_directories(test_layout_model PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+target_link_libraries(test_layout_model PRIVATE
+    Qt6::Core
+    Qt6::DBus
+)
+add_test(NAME test_layout_model COMMAND test_layout_model)
+
 # Installation
 include(GNUInstallDirs)
 
@@ -124,10 +141,16 @@ install(TARGETS strata
     DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-install(FILES desktop/org.freedesktop.Strata.desktop
+install(FILES desktop/io.github.lebedenko.Strata.desktop
     DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
 )
 
 install(FILES desktop/strata.svg
     DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps
+)
+
+install(FILES
+    resources/layouts/eyelash_corne.json
+    resources/layouts/voyager.json
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/strata/layouts
 )

@@ -36,6 +36,25 @@ ToolBar {
                 font.bold: true
                 anchors.verticalCenter: parent.verticalCenter
             }
+
+            Rectangle {
+                visible: root.dbusClient && root.dbusClient.connected && root.dbusClient.deviceType.length > 0
+                width: typeText.implicitWidth + 8
+                height: 16
+                radius: 3
+                color: palette.mid
+                anchors.verticalCenter: parent.verticalCenter
+
+                Label {
+                    id: typeText
+                    text: root.dbusClient.deviceType === "qmk_voyager" ? "QMK Raw HID" : 
+                          (root.dbusClient.deviceType === "zmk_raw_hid" ? "ZMK Raw HID" : root.dbusClient.deviceType.toUpperCase())
+                    anchors.centerIn: parent
+                    font.pointSize: 7.5
+                    font.bold: true
+                    color: palette.buttonText
+                }
+            }
         }
 
         // Build ID

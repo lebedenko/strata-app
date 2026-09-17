@@ -1,14 +1,21 @@
 #include "model/keymap_model.hpp"
 
+#include <QDir>
+#include <QFile>
 #include <QJsonArray>
+#include <QJsonDocument>
 #include <QJsonObject>
 #include <algorithm>
+#include <iostream>
 
 namespace strata::model {
 
 KeymapModel::KeymapModel(dbus::StrataDBusClient *client, QObject *parent)
     : QAbstractListModel(parent)
     , client_(client) {
+    // Initial layout load
+    loadLayout("eyelash_corne");
+
     if (client_) {
         connect(client_, &dbus::StrataDBusClient::selectedLayerChanged, this,
                 [this]() { setCurrentLayer(client_->selectedLayerIndex()); });
@@ -21,9 +28,19 @@ KeymapModel::KeymapModel(dbus::StrataDBusClient *client, QObject *parent)
 
         connect(client_, &dbus::StrataDBusClient::keymapLoaded, this, &KeymapModel::onKeymapLoaded);
 
+        connect(client_, &dbus::StrataDBusClient::statusChanged, this,
+                &KeymapModel::onDeviceStateChanged);
+
+        connect(client_, &dbus::StrataDBusClient::activeDeviceChanged, this,
+                &KeymapModel::onDeviceStateChanged);
+
+        connect(client_, &dbus::StrataDBusClient::layersChanged, this,
+                [this]() { populateKeys(currentLayer_); });
+
+        updateLayoutFromDevice();
         currentLayer_ = client_->selectedLayerIndex();
-        populateKeys(currentLayer_);
     }
+    populateKeys(currentLayer_);
 }
 
 int KeymapModel::rowCount(const QModelIndex &parent) const {
@@ -81,6 +98,73 @@ void KeymapModel::setCurrentLayer(int layer) {
     }
 }
 
+void KeymapModel::setLayoutId(const QString &id) {
+    if (layoutId_ != id) {
+        loadLayout(id);
+    }
+}
+
+bool KeymapModel::loadLayout(const QString &layoutId) {
+    QStringList candidates = {
+        QString(":/qt/qml/Strata/resources/layouts/%1.json").arg(layoutId),
+        QString(QDir::homePath() + "/.config/strata/layouts/%1.json").arg(layoutId),
+        QString("/usr/share/strata/layouts/%1.json").arg(layoutId),
+        QString("resources/layouts/%1.json").arg(layoutId),
+        QString("../resources/layouts/%1.json").arg(layoutId)};
+
+    QByteArray fileData;
+    for (const auto &path : candidates) {
+        QFile file(path);
+        if (file.open(QIODevice::ReadOnly)) {
+            fileData = file.readAll();
+            break;
+        }
+    }
+
+    if (fileData.isEmpty()) {
+        qWarning("Failed to load layout profile for '%s'", qPrintable(layoutId));
+        return false;
+    }
+
+    QJsonDocument doc = QJsonDocument::fromJson(fileData);
+    if (!doc.isObject()) {
+        qWarning("Layout profile '%s' is not a valid JSON object", qPrintable(layoutId));
+        return false;
+    }
+
+    layoutJson_ = doc.object();
+    layoutData_ = layoutJson_.toVariantMap();
+    layoutId_ = layoutId;
+
+    emit layoutDataChanged();
+    emit layoutIdChanged();
+    populateKeys(currentLayer_);
+    return true;
+}
+
+void KeymapModel::updateLayoutFromDevice() {
+    if (!client_)
+        return;
+
+    QString name = client_->deviceName().toLower();
+    QString id = client_->deviceId().toLower();
+    QString type = client_->deviceType().toLower();
+
+    QString targetLayout = "eyelash_corne";
+    if (name.contains("voyager") || id.contains("voyager") || type.contains("voyager")) {
+        targetLayout = "voyager";
+    }
+
+    if (targetLayout != layoutId_) {
+        loadLayout(targetLayout);
+    }
+}
+
+void KeymapModel::onDeviceStateChanged() {
+    updateLayoutFromDevice();
+    populateKeys(currentLayer_);
+}
+
 void KeymapModel::reload() {
     populateKeys(currentLayer_);
 }
@@ -100,14 +184,31 @@ QVariantMap KeymapModel::getKeyData(int position) const {
             {"category", "misc"}};
 }
 
-QVariantMap KeymapModel::getSensorData(int sensorIndex) const {
-    // 1. Get Press Key Data (Matrix pos 34 on Eyelash Corne)
-    QVariantMap pressData = getKeyData(34);
-    QString pressLabel = pressData.value("primaryLabel", "MUTE").toString();
+QVariantMap KeymapModel::getSensorData(int sensorIndex, int pressPos) const {
+    // 1. Determine press key position from layout if not specified
+    if (pressPos < 0) {
+        pressPos = 34; // default fallback
+        if (layoutJson_.contains("centerControls") && layoutJson_["centerControls"].isArray()) {
+            for (const auto &cVal : layoutJson_["centerControls"].toArray()) {
+                if (cVal.isObject()) {
+                    auto cObj = cVal.toObject();
+                    if (cObj.value("type").toString() == "rotary_knob" &&
+                        cObj.value("sensorIndex").toInt(0) == sensorIndex) {
+                        pressPos = cObj.value("pressPos").toInt(34);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    // 2. Get Press Key Data
+    QVariantMap pressData = getKeyData(pressPos);
+    QString pressLabel = pressData.value("primaryLabel", "PUSH").toString();
     QString pressCategory = pressData.value("category", "media").toString();
     QString pressTooltip = pressData.value("tooltip", "Push Switch").toString();
 
-    // 2. Check if dynamic sensor data was received from hardware/cache
+    // 3. Dynamic sensor data received from hardware/cache
     for (const auto &s : sensors_) {
         if (s.sensorIndex == sensorIndex) {
             return {{"hasData", true},
@@ -118,60 +219,50 @@ QVariantMap KeymapModel::getSensorData(int sensorIndex) const {
                     {"category", s.category},
                     {"pressLabel", pressLabel},
                     {"pressCategory", pressCategory},
-                    {"pressTooltip", pressTooltip}};
+                    {"pressTooltip", pressTooltip},
+                    {"pressKeyPos", pressPos}};
         }
     }
 
-    // 3. Fallback for Eyelash Corne (until firmware update with sensor protocol is flashed)
-    QString cwLabel;
-    QString ccwLabel;
-    QString behavior;
-    QString desc;
-    QString cat = "media";
+    // 4. Declarative sensor defaults from layout profile
+    if (layoutJson_.contains("sensorDefaults") && layoutJson_["sensorDefaults"].isObject()) {
+        QJsonObject sDefaults = layoutJson_["sensorDefaults"].toObject();
+        QString sIdxStr = QString::number(sensorIndex);
+        if (sDefaults.contains(sIdxStr) && sDefaults[sIdxStr].isObject()) {
+            QJsonObject layersMap = sDefaults[sIdxStr].toObject();
+            QString layerStr = QString::number(currentLayer_);
+            QJsonObject defObj;
+            if (layersMap.contains(layerStr) && layersMap[layerStr].isObject()) {
+                defObj = layersMap[layerStr].toObject();
+            } else if (layersMap.contains("default") && layersMap["default"].isObject()) {
+                defObj = layersMap["default"].toObject();
+            }
 
-    switch (currentLayer_) {
-    case 0: // QWERTY: &inc_dec_kp C_VOLUME_UP C_VOLUME_DOWN
-        behavior = "inc_dec_kp";
-        cwLabel = "VOL+";
-        ccwLabel = "VOL-";
-        desc = "Volume Control (CW: Vol+, CCW: Vol-)";
-        cat = "media";
-        break;
-    case 1: // NUMBER: &scroll_encoder (msc SCRL_DOWN, SCRL_UP)
-    case 2: // NAV: &scroll_encoder
-    case 4: // FN: &scroll_encoder
-    case 5: // GAME: &scroll_encoder
-        behavior = "scroll_encoder";
-        cwLabel = "SCRL DN";
-        ccwLabel = "SCRL UP";
-        desc = "Mouse Scroll (CW: Down, CCW: Up)";
-        cat = "nav";
-        break;
-    case 3: // SYS: &rgb_encoder (rgb_ug RGB_BRI, RGB_BRD)
-        behavior = "rgb_encoder";
-        cwLabel = "RGB BRI";
-        ccwLabel = "RGB BRD";
-        desc = "RGB Brightness (CW: Bri+, CCW: Bri-)";
-        cat = "misc";
-        break;
-    default:
-        behavior = "scroll_encoder";
-        cwLabel = "SCRL DN";
-        ccwLabel = "SCRL UP";
-        desc = "Rotary Encoder";
-        cat = "nav";
-        break;
+            if (!defObj.isEmpty()) {
+                return {{"hasData", true},
+                        {"behavior", defObj.value("behavior").toString()},
+                        {"cwLabel", defObj.value("cwLabel").toString("CW")},
+                        {"ccwLabel", defObj.value("ccwLabel").toString("CCW")},
+                        {"tooltip", defObj.value("tooltip").toString("Rotary Encoder")},
+                        {"category", defObj.value("category").toString("media")},
+                        {"pressLabel", pressLabel},
+                        {"pressCategory", pressCategory},
+                        {"pressTooltip", pressTooltip},
+                        {"pressKeyPos", pressPos}};
+            }
+        }
     }
 
-    return {{"hasData", true},
-            {"behavior", behavior},
-            {"cwLabel", cwLabel},
-            {"ccwLabel", ccwLabel},
-            {"tooltip", desc},
-            {"category", cat},
+    return {{"hasData", false},
+            {"behavior", ""},
+            {"cwLabel", "CW"},
+            {"ccwLabel", "CCW"},
+            {"tooltip", "Rotary Encoder"},
+            {"category", "misc"},
             {"pressLabel", pressLabel},
             {"pressCategory", pressCategory},
-            {"pressTooltip", pressTooltip}};
+            {"pressTooltip", pressTooltip},
+            {"pressKeyPos", pressPos}};
 }
 
 void KeymapModel::onLayerBindingsLoaded(int layer, int count) {
@@ -189,15 +280,16 @@ void KeymapModel::onKeymapLoaded(const QString &buildId, const QString &source, 
 }
 
 void KeymapModel::populateKeys(int layer) {
-    if (!client_)
-        return;
-
     isLoading_ = true;
     emit isLoadingChanged();
 
-    QJsonObject keymapObj = client_->fetchKeymapJson(layer);
     QVector<KeyItem> newKeys;
     QVector<SensorItem> newSensors;
+
+    QJsonObject keymapObj;
+    if (client_) {
+        keymapObj = client_->fetchKeymapJson(layer);
+    }
 
     if (keymapObj.contains("bindings") && keymapObj["bindings"].isObject()) {
         QJsonObject bindingsObj = keymapObj["bindings"].toObject();
@@ -214,12 +306,20 @@ void KeymapModel::populateKeys(int layer) {
                     item.param1 = static_cast<uint32_t>(bObj.value("param1").toInteger(0));
                     item.param2 = static_cast<uint32_t>(bObj.value("param2").toInteger(0));
 
-                    auto decoded =
-                        decoder::KeycodeDecoder::decode(item.behavior, item.param1, item.param2);
-                    item.primaryLabel = decoded.primaryLabel;
-                    item.secondaryLabel = decoded.secondaryLabel;
-                    item.tooltip = decoded.tooltip;
-                    item.category = decoded.category;
+                    if (bObj.contains("primaryLabel") || bObj.contains("category") ||
+                        bObj.contains("tooltip")) {
+                        item.primaryLabel = bObj.value("primaryLabel").toString();
+                        item.secondaryLabel = bObj.value("secondaryLabel").toString();
+                        item.tooltip = bObj.value("tooltip").toString();
+                        item.category = bObj.value("category").toString("misc");
+                    } else {
+                        auto decoded = decoder::KeycodeDecoder::decode(item.behavior, item.param1,
+                                                                       item.param2);
+                        item.primaryLabel = decoded.primaryLabel;
+                        item.secondaryLabel = decoded.secondaryLabel;
+                        item.tooltip = decoded.tooltip;
+                        item.category = decoded.category;
+                    }
 
                     newKeys.append(item);
                 }
@@ -255,9 +355,10 @@ void KeymapModel::populateKeys(int layer) {
     std::sort(newKeys.begin(), newKeys.end(),
               [](const KeyItem &a, const KeyItem &b) { return a.position < b.position; });
 
-    // If no keys parsed yet, create 48 placeholder keys
+    // If no keys parsed yet, create placeholder keys matching layout totalKeys
     if (newKeys.isEmpty()) {
-        for (int i = 0; i < 48; ++i) {
+        int total = layoutJson_.value("totalKeys").toInt(48);
+        for (int i = 0; i < total; ++i) {
             KeyItem item;
             item.position = i;
             item.primaryLabel = QString::number(i);

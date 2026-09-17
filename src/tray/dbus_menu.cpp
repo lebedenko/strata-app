@@ -1,14 +1,46 @@
 #include "tray/dbus_menu.hpp"
 
 #include <QDBusConnection>
+#include <QDBusMetaType>
 #include <QLoggingCategory>
 
 namespace strata::tray {
 
 Q_LOGGING_CATEGORY(lcDBusMenu, "strata.tray.dbusmenu")
 
+QDBusArgument &operator<<(QDBusArgument &arg, const DBusMenuItem &item) {
+    arg.beginStructure();
+    arg << item.id;
+    arg << item.properties;
+    arg.beginArray(qMetaTypeId<QDBusVariant>());
+    for (const auto &child : item.children) {
+        arg << child;
+    }
+    arg.endArray();
+    arg.endStructure();
+    return arg;
+}
+
+const QDBusArgument &operator>>(const QDBusArgument &arg, DBusMenuItem &item) {
+    arg.beginStructure();
+    arg >> item.id;
+    arg >> item.properties;
+    arg.beginArray();
+    item.children.clear();
+    while (!arg.atEnd()) {
+        QDBusVariant child;
+        arg >> child;
+        item.children.append(child);
+    }
+    arg.endArray();
+    arg.endStructure();
+    return arg;
+}
+
 DBusMenuService::DBusMenuService(QObject *parent)
-    : QObject(parent) {}
+    : QObject(parent) {
+    qDBusRegisterMetaType<DBusMenuItem>();
+}
 
 bool DBusMenuService::AboutToShow(int id) {
     Q_UNUSED(id);
@@ -24,37 +56,22 @@ void DBusMenuService::GetLayout(int parentId, int recursionDepth, const QStringL
     auto reply = message.createReply();
     const uint revision = 1;
 
-    // Root layout struct: (id, properties, children)
-    QDBusArgument rootArg;
-    rootArg.beginStructure();
-    rootArg << 0; // Root id is 0
-
-    QVariantMap rootProps;
-    rootProps[QStringLiteral("children-display")] = QStringLiteral("submenu");
-    rootArg << rootProps;
-
-    rootArg.beginArray(qMetaTypeId<QDBusVariant>());
+    DBusMenuItem rootItem;
+    rootItem.id = 0;
+    rootItem.properties[QStringLiteral("children-display")] = QStringLiteral("submenu");
 
     auto appendItem = [&](int id, const QString &label,
                           const QString &type = QStringLiteral("standard")) {
-        QDBusArgument childArg;
-        childArg.beginStructure();
-        childArg << id;
-
-        QVariantMap props;
-        props[QStringLiteral("enabled")] = true;
-        props[QStringLiteral("visible")] = true;
-        props[QStringLiteral("type")] = type;
+        DBusMenuItem childItem;
+        childItem.id = id;
+        childItem.properties[QStringLiteral("enabled")] = true;
+        childItem.properties[QStringLiteral("visible")] = true;
+        childItem.properties[QStringLiteral("type")] = type;
         if (!label.isEmpty()) {
-            props[QStringLiteral("label")] = label;
+            childItem.properties[QStringLiteral("label")] = label;
         }
 
-        childArg << props;
-        childArg.beginArray(qMetaTypeId<QDBusVariant>());
-        childArg.endArray();
-        childArg.endStructure();
-
-        rootArg << QDBusVariant(QVariant::fromValue(childArg));
+        rootItem.children.append(QDBusVariant(QVariant::fromValue(childItem)));
     };
 
     appendItem(1, tr("Open Visualizer"));
@@ -64,10 +81,7 @@ void DBusMenuService::GetLayout(int parentId, int recursionDepth, const QStringL
     appendItem(5, QString{}, QStringLiteral("separator"));
     appendItem(6, tr("Quit"));
 
-    rootArg.endArray();
-    rootArg.endStructure();
-
-    reply << revision << QVariant::fromValue(rootArg);
+    reply << revision << QVariant::fromValue(rootItem);
     QDBusConnection::sessionBus().send(reply);
 }
 

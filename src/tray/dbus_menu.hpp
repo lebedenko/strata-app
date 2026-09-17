@@ -8,6 +8,15 @@
 
 namespace strata::tray {
 
+struct DBusMenuItem {
+    int id{0};
+    QVariantMap properties;
+    QList<QDBusVariant> children;
+};
+
+QDBusArgument &operator<<(QDBusArgument &arg, const DBusMenuItem &item);
+const QDBusArgument &operator>>(const QDBusArgument &arg, DBusMenuItem &item);
+
 class DBusMenuService : public QObject {
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", "com.canonical.dbusmenu")
@@ -67,3 +76,5 @@ signals:
 };
 
 } // namespace strata::tray
+
+Q_DECLARE_METATYPE(strata::tray::DBusMenuItem)
