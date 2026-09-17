@@ -23,15 +23,14 @@ Item {
     readonly property string pressCategory: sensorData ? sensorData.pressCategory : "media"
     readonly property string tooltipText: sensorData ? sensorData.tooltip : "Rotary Encoder"
 
-    // Theme helpers
-    readonly property bool isLight: palette.dark.hslLightness > 0.5
-    readonly property color dialBg: isLight ? "#f1f5f9" : "#18181b"
-    readonly property color dialBorder: isLight ? "#cbd5e1" : "#3f3f46"
-    readonly property color pressBtnBg: isLight ? "#e2e8f0" : "#27272a"
-    readonly property color pressBtnHover: isLight ? "#d8b4fe" : "#3b82f6"
-    readonly property color textColor: palette.text
-    readonly property color subTextColor: isLight ? "#64748b" : "#a1a1aa"
-    readonly property color accentColor: isLight ? "#2563eb" : "#60a5fa"
+    // Theme palette mappings
+    readonly property color dialBg: palette.base
+    readonly property color dialBorder: palette.mid
+    readonly property color pressBtnBg: palette.button
+    readonly property color pressBtnHover: Qt.tint(palette.button, Qt.rgba(palette.highlight.r, palette.highlight.g, palette.highlight.b, 0.2))
+    readonly property color textColor: palette.buttonText
+    readonly property color subTextColor: palette.placeholderText
+    readonly property color accentColor: palette.highlight
 
     // Outer Dial Container
     Rectangle {
@@ -51,7 +50,7 @@ Item {
             height: parent.height - 8
             radius: width / 2
             color: "transparent"
-            border.color: isLight ? "#e2e8f0" : "#2d2d30"
+            border.color: palette.mid
             border.width: 1
         }
 
@@ -67,7 +66,7 @@ Item {
                 anchors.centerIn: parent
                 spacing: 1
 
-                Text {
+                Label {
                     text: "⟲"
                     font.pointSize: 9
                     font.bold: true
@@ -75,7 +74,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
-                Text {
+                Label {
                     text: root.ccwLabel
                     font.pointSize: 6.5
                     font.bold: true
@@ -99,7 +98,7 @@ Item {
                 anchors.centerIn: parent
                 spacing: 1
 
-                Text {
+                Label {
                     text: "⟳"
                     font.pointSize: 9
                     font.bold: true
@@ -107,7 +106,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
-                Text {
+                Label {
                     text: root.cwLabel
                     font.pointSize: 6.5
                     font.bold: true
@@ -137,7 +136,7 @@ Item {
                 anchors.centerIn: parent
                 spacing: 0
 
-                Text {
+                Label {
                     text: root.pressLabel
                     font.pointSize: root.pressLabel.length > 4 ? 6.5 : 7.5
                     font.bold: true
@@ -146,7 +145,7 @@ Item {
                     elide: Text.ElideRight
                 }
 
-                Text {
+                Label {
                     visible: root.showPosition
                     text: "#34"
                     font.pointSize: 5.5
@@ -164,7 +163,7 @@ Item {
     }
 
     // Top Header Label
-    Text {
+    Label {
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
         text: qsTr("KNOB")

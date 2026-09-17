@@ -14,8 +14,6 @@ ApplicationWindow {
     minimumWidth: 840
     minimumHeight: 460
 
-    color: palette.dark.hslLightness > 0.5 ? "#f8fafc" : "#09090b"
-
     onClosing: function(close) {
         if (configManager && configManager.showTrayIcon) {
             close.accepted = false;
@@ -24,15 +22,8 @@ ApplicationWindow {
     }
 
     // Top Navigation & Header Bar
-    Rectangle {
+    header: ToolBar {
         id: headerBar
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        height: 54
-        color: palette.dark.hslLightness > 0.5 ? "#ffffff" : "#18181b"
-        border.color: palette.dark.hslLightness > 0.5 ? "#e2e8f0" : "#27272a"
-        border.width: 1
 
         Row {
             anchors.left: parent.left
@@ -49,12 +40,11 @@ ApplicationWindow {
                 anchors.verticalCenter: parent.verticalCenter
             }
 
-            Text {
+            Label {
                 text: qsTr("STRATA")
                 font.pointSize: 12
                 font.bold: true
                 font.letterSpacing: 2
-                color: palette.text
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -90,10 +80,7 @@ ApplicationWindow {
     // Main Keyboard Visualizer Area
     Item {
         id: visualizerArea
-        anchors.top: headerBar.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: statusBar.top
+        anchors.fill: parent
         anchors.margins: 12
 
         SplitKeyboard {
@@ -105,11 +92,8 @@ ApplicationWindow {
     }
 
     // Status Footer
-    StatusBar {
+    footer: StatusBar {
         id: statusBar
         dbusClient: strataDBusClient
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
     }
 }

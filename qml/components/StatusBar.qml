@@ -1,16 +1,13 @@
 import QtQuick
 import QtQuick.Controls
 
-Rectangle {
+ToolBar {
     id: root
 
     required property var dbusClient
     property bool isRefreshing: false
 
     implicitHeight: 36
-    color: palette.dark.hslLightness > 0.5 ? "#f1f5f9" : "#18181b"
-    border.color: palette.dark.hslLightness > 0.5 ? "#e2e8f0" : "#27272a"
-    border.width: 1
 
     Row {
         anchors.left: parent.left
@@ -31,19 +28,18 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
             }
 
-            Text {
+            Label {
                 text: root.dbusClient && root.dbusClient.connected ? 
                       root.dbusClient.deviceName + " (" + root.dbusClient.deviceNode + ")" : 
                       qsTr("Keyboard Disconnected")
                 font.pointSize: 9
                 font.bold: true
-                color: palette.text
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
 
         // Build ID
-        Text {
+        Label {
             visible: root.dbusClient && root.dbusClient.connected && root.dbusClient.buildId.length > 0
             text: qsTr("Build: ") + root.dbusClient.buildId
             font.pointSize: 9
@@ -57,16 +53,16 @@ Rectangle {
             width: cacheText.implicitWidth + 12
             height: 18
             radius: 4
-            color: root.dbusClient.isCached ? "#0ea5e9" : "#f59e0b"
+            color: root.dbusClient.isCached ? palette.highlight : palette.mid
             anchors.verticalCenter: parent.verticalCenter
 
-            Text {
+            Label {
                 id: cacheText
                 text: root.dbusClient.isCached ? qsTr("Cached") : qsTr("Live")
                 anchors.centerIn: parent
                 font.pointSize: 8
                 font.bold: true
-                color: "#ffffff"
+                color: root.dbusClient.isCached ? palette.highlightedText : palette.buttonText
             }
         }
     }
@@ -83,18 +79,18 @@ Rectangle {
             width: activeLayerText.implicitWidth + 16
             height: 22
             radius: 6
-            color: palette.dark.hslLightness > 0.5 ? "#e2e8f0" : "#27272a"
-            border.color: "#38bdf8"
+            color: palette.base
+            border.color: palette.highlight
             border.width: 1
             anchors.verticalCenter: parent.verticalCenter
 
-            Text {
+            Label {
                 id: activeLayerText
                 text: qsTr("HW Active: ") + (root.dbusClient ? root.dbusClient.activeLayerName : "")
                 anchors.centerIn: parent
                 font.pointSize: 9
                 font.bold: true
-                color: "#38bdf8"
+                color: palette.highlight
             }
         }
 

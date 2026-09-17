@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 
 Item {
@@ -147,14 +148,14 @@ Item {
             height: 124
             anchors.verticalCenter: parent.verticalCenter
 
-            Text {
+            Label {
                 anchors.top: parent.top
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: qsTr("JOYSTICK")
                 font.pointSize: 6.5
                 font.bold: true
                 font.letterSpacing: 1.5
-                color: palette.dark.hslLightness > 0.5 ? "#64748b" : "#a1a1aa"
+                color: palette.placeholderText
             }
 
             Item {

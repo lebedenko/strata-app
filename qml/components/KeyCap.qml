@@ -18,10 +18,10 @@ Item {
     readonly property color accentColor: {
         switch (category) {
         case "mod":   return "#f59e0b"; // Amber for modifiers
-        case "layer": return "#38bdf8"; // Sky blue for layer switches
+        case "layer": return palette.highlight; // Theme highlight for layer switches
         case "nav":   return "#a855f7"; // Purple for navigation/mouse
         case "media": return "#10b981"; // Emerald for media
-        default:      return "#94a3b8"; // Slate for alphas/symbols
+        default:      return palette.placeholderText; // Theme placeholder for alphas/symbols
         }
     }
 
@@ -31,19 +31,19 @@ Item {
         anchors.margins: 2
         radius: 8
         color: mouseArea.containsMouse ? 
-               (palette.dark.hslLightness > 0.5 ? "#e2e8f0" : "#27272a") : 
-               (palette.dark.hslLightness > 0.5 ? "#ffffff" : "#18181b")
+               Qt.tint(palette.button, Qt.rgba(palette.highlight.r, palette.highlight.g, palette.highlight.b, 0.15)) : 
+               palette.button
 
         border.color: mouseArea.containsMouse ? 
                       root.accentColor : 
-                      (palette.dark.hslLightness > 0.5 ? "#cbd5e1" : "#3f3f46")
+                      palette.mid
         border.width: mouseArea.containsMouse ? 1.5 : 1
 
         Behavior on color { ColorAnimation { duration: 120 } }
         Behavior on border.color { ColorAnimation { duration: 120 } }
 
         // Position badge
-        Text {
+        Label {
             visible: root.showPosition && root.position >= 0
             text: root.position
             anchors.top: parent.top
@@ -55,7 +55,7 @@ Item {
         }
 
         // Secondary / Hold modifier label (top-right)
-        Text {
+        Label {
             id: secLabel
             visible: root.secondaryText.length > 0
             text: root.secondaryText
@@ -69,7 +69,7 @@ Item {
         }
 
         // Primary / Tap key label (center)
-        Text {
+        Label {
             id: primLabel
             text: root.primaryText
             anchors.centerIn: parent
@@ -80,7 +80,7 @@ Item {
                 return 7.5;
             }
             font.bold: true
-            color: palette.text
+            color: palette.buttonText
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight
