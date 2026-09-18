@@ -119,9 +119,19 @@ void StrataDBusClient::refreshDevices() {
         }
     }
 
-    if (!activePath.isEmpty() && activePath != "/") {
+    if (newDevices.isEmpty()) {
+        activeDevicePath_.clear();
+        deviceId_.clear();
+        connected_ = false;
+        layersCount_ = 0;
+        isCached_ = false;
+        emit statusChanged();
+    } else if (!activePath.isEmpty() && activePath != "/") {
         activeDevicePath_ = activePath;
         deviceId_ = activeDevicePath_.section('/', -1);
+    } else if (activeDevicePath_.isEmpty() && !newDevices.isEmpty()) {
+        activeDevicePath_ = newDevices.first().toMap().value("path").toString();
+        deviceId_ = newDevices.first().toMap().value("id").toString();
     }
 
     availableDevices_ = newDevices;
@@ -208,12 +218,20 @@ void StrataDBusClient::parseStatusJson(const QString &jsonStr) {
 
 void StrataDBusClient::refreshLayers() {
     auto devIface = makeDeviceInterface(KeymapInterface);
-    if (!devIface->isValid())
+    if (!devIface->isValid()) {
+        if (!layers_.isEmpty()) {
+            layers_.clear();
+            emit layersChanged();
+        }
         return;
+    }
 
     QDBusReply<QString> reply = devIface->call("GetLayers");
     if (reply.isValid()) {
         parseLayersJson(reply.value());
+    } else if (!layers_.isEmpty()) {
+        layers_.clear();
+        emit layersChanged();
     }
 }
 
@@ -315,19 +333,31 @@ void StrataDBusClient::onLayerChangedSignal(uint index, const QString &name, uin
     activeLayerIndex_ = static_cast<int>(index);
     activeLayerName_ = name;
     activeLayerMask_ = mask;
-    if (!buildId.isEmpty()) {
+    bool statusUpdated = false;
+    if (!buildId.isEmpty() && buildId_ != buildId) {
         buildId_ = buildId;
+        statusUpdated = true;
+    }
+    if (!connected_) {
+        connected_ = true;
+        statusUpdated = true;
+    }
+    if (statusUpdated) {
+        emit statusChanged();
     }
 
-    for (auto &layerVar : layers_) {
-        QVariantMap map = layerVar.toMap();
-        map["active"] = (map["index"].toInt() == activeLayerIndex_);
-        layerVar = map;
+    if (layers_.isEmpty()) {
+        refreshLayers();
+    } else {
+        for (auto &layerVar : layers_) {
+            QVariantMap map = layerVar.toMap();
+            map["active"] = (map["index"].toInt() == activeLayerIndex_);
+            layerVar = map;
+        }
+        emit layersChanged();
     }
 
     emit activeLayerChanged(activeLayerIndex_, activeLayerName_, activeLayerMask_);
-    emit layersChanged();
-
     setSelectedLayerIndex(activeLayerIndex_);
 }
 
@@ -356,12 +386,17 @@ void StrataDBusClient::onLayerBindingsLoadedSignal(uint layer, uint count,
 
 void StrataDBusClient::onDeviceAddedSignal(const QDBusObjectPath &path, const QString &deviceId) {
     refreshDevices();
+    refreshStatus();
+    refreshLayers();
     emit deviceConnected(deviceId, path.path(), "");
+    emit activeDeviceChanged(deviceId_, activeDevicePath_);
 }
 
 void StrataDBusClient::onDeviceRemovedSignal(const QDBusObjectPath &path, const QString &deviceId) {
     Q_UNUSED(path);
     refreshDevices();
+    refreshStatus();
+    refreshLayers();
     emit deviceDisconnected(deviceId);
 }
 

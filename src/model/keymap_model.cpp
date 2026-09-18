@@ -37,6 +37,12 @@ KeymapModel::KeymapModel(dbus::StrataDBusClient *client, QObject *parent)
         connect(client_, &dbus::StrataDBusClient::layersChanged, this,
                 [this]() { populateKeys(currentLayer_); });
 
+        connect(client_, &dbus::StrataDBusClient::deviceConnected, this,
+                [this](const QString &, const QString &, const QString &) {
+                    updateLayoutFromDevice();
+                    populateKeys(currentLayer_);
+                });
+
         updateLayoutFromDevice();
         currentLayer_ = client_->selectedLayerIndex();
     }
