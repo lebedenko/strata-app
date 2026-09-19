@@ -91,7 +91,29 @@ int main(int argc, char *argv[]) {
         std::cout << "[PASS] ZSA Voyager layout profile verified\n";
     }
 
-    // 3. Test KeymapModel loading layouts and declarative sensor defaults
+    // 3. Verify TwinDial 25 layout profile directly
+    {
+        QFile file("resources/layouts/twindial25.json");
+        if (!file.open(QIODevice::ReadOnly)) {
+            file.setFileName("../resources/layouts/twindial25.json");
+            TEST_ASSERT(file.open(QIODevice::ReadOnly));
+        }
+        auto doc = QJsonDocument::fromJson(file.readAll());
+        TEST_ASSERT(doc.isObject());
+        auto obj = doc.object();
+
+        TEST_ASSERT(obj.value("id").toString() == "twindial25");
+        TEST_ASSERT(obj.value("type").toString() == "macropad");
+        TEST_ASSERT(obj.value("totalKeys").toInt() == 24);
+
+        auto grid = obj.value("grid").toObject();
+        auto rowsData = grid.value("rowsData").toArray();
+        TEST_ASSERT(rowsData.size() == 5);
+
+        std::cout << "[PASS] TwinDial 25 layout profile verified\n";
+    }
+
+    // 4. Test KeymapModel loading layouts and declarative sensor defaults
     {
         strata::model::KeymapModel model(nullptr);
         bool loadedCorne = model.loadLayout("eyelash_corne");
@@ -119,6 +141,24 @@ int main(int argc, char *argv[]) {
         TEST_ASSERT(loadedVoyager);
         TEST_ASSERT(model.layoutId() == "voyager");
         TEST_ASSERT(model.totalKeys() == 52);
+
+        // Switch to TwinDial 25 layout
+        bool loadedTwinDial = model.loadLayout("twindial25");
+        TEST_ASSERT(loadedTwinDial);
+        TEST_ASSERT(model.layoutId() == "twindial25");
+        TEST_ASSERT(model.totalKeys() == 24);
+
+        // Check sensor defaults on TwinDial layer 0 (Zoom and Volume)
+        model.setCurrentLayer(0);
+        auto tdS0 = model.getSensorData(0);
+        TEST_ASSERT(tdS0.value("hasData").toBool());
+        TEST_ASSERT(tdS0.value("cwLabel").toString() == "ZOOM-");
+        TEST_ASSERT(tdS0.value("ccwLabel").toString() == "ZOOM+");
+
+        auto tdS1 = model.getSensorData(1);
+        TEST_ASSERT(tdS1.value("hasData").toBool());
+        TEST_ASSERT(tdS1.value("cwLabel").toString() == "VOL-");
+        TEST_ASSERT(tdS1.value("ccwLabel").toString() == "VOL+");
 
         std::cout << "[PASS] KeymapModel declarative layout switching and sensor defaults\n";
     }

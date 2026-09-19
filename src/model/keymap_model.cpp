@@ -159,6 +159,8 @@ void KeymapModel::updateLayoutFromDevice() {
     QString targetLayout = "eyelash_corne";
     if (name.contains("voyager") || id.contains("voyager") || type.contains("voyager")) {
         targetLayout = "voyager";
+    } else if (name.contains("twindial") || id.contains("twindial") || type.contains("twindial")) {
+        targetLayout = "twindial25";
     }
 
     if (targetLayout != layoutId_) {

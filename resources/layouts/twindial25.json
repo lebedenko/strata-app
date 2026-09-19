@@ -1,0 +1,40 @@
+{
+  "id": "twindial25",
+  "name": "TwinDial 25",
+  "type": "macropad",
+  "description": "5x5 Orthogonal Macropad with Dual Rotary Encoders",
+  "totalKeys": 24,
+  "width": 640,
+  "height": 340,
+  "grid": {
+    "rows": 5,
+    "cols": 5,
+    "rowsData": [
+      { "keys": [0, 1, 2, 3, 4] },
+      { "keys": [5, 6, 7, 8, 9] },
+      { "keys": [10, 11, 12, 13, 14] },
+      { "keys": [15, 16, 17, 18, 19] },
+      { "keys": [
+        { "pos": 20, "width": 52 },
+        { "pos": 21, "width": 110 },
+        { "pos": 22, "width": 52 },
+        { "pos": 23, "width": 52 }
+      ]}
+    ]
+  },
+  "centerControls": [],
+  "sensorDefaults": {
+    "0": {
+      "0": { "behavior": "zoom", "cwLabel": "ZOOM-", "ccwLabel": "ZOOM+", "tooltip": "Zoom Control (CW: Zoom-, CCW: Zoom+)", "category": "nav" },
+      "1": { "behavior": "rgb_val", "cwLabel": "BRT-", "ccwLabel": "BRT+", "tooltip": "RGB Brightness (CW: Dec, CCW: Inc)", "category": "media" },
+      "2": { "behavior": "rgb_hue", "cwLabel": "HUE-", "ccwLabel": "HUE+", "tooltip": "RGB Hue (CW: Dec, CCW: Inc)", "category": "media" },
+      "3": { "behavior": "rgb_spd", "cwLabel": "SPD-", "ccwLabel": "SPD+", "tooltip": "RGB Speed (CW: Dec, CCW: Inc)", "category": "media" }
+    },
+    "1": {
+      "0": { "behavior": "volume", "cwLabel": "VOL-", "ccwLabel": "VOL+", "tooltip": "Volume Control (CW: Vol-, CCW: Vol+)", "category": "media" },
+      "1": { "behavior": "rgb_mode", "cwLabel": "EFF-", "ccwLabel": "EFF+", "tooltip": "RGB Effect Mode (CW: Prev, CCW: Next)", "category": "media" },
+      "2": { "behavior": "rgb_sat", "cwLabel": "SAT-", "ccwLabel": "SAT+", "tooltip": "RGB Saturation (CW: Dec, CCW: Inc)", "category": "media" },
+      "3": { "behavior": "rgb_sat", "cwLabel": "SAT-", "ccwLabel": "SAT+", "tooltip": "RGB Saturation (CW: Dec, CCW: Inc)", "category": "media" }
+    }
+  }
+}

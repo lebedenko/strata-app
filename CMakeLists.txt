@@ -68,12 +68,14 @@ qt_add_qml_module(strata
         qml/components/KeyCap.qml
         qml/components/RotaryKnob.qml
         qml/components/SplitKeyboard.qml
+        qml/components/MacropadKeyboard.qml
         qml/components/LayerTabBar.qml
         qml/components/StatusBar.qml
     RESOURCES
         desktop/strata.svg
         resources/layouts/eyelash_corne.json
         resources/layouts/voyager.json
+        resources/layouts/twindial25.json
 )
 
 target_include_directories(strata PRIVATE
@@ -152,5 +154,6 @@ install(FILES desktop/strata.svg
 install(FILES
     resources/layouts/eyelash_corne.json
     resources/layouts/voyager.json
+    resources/layouts/twindial25.json
     DESTINATION ${CMAKE_INSTALL_DATADIR}/strata/layouts
 )

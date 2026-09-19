@@ -107,11 +107,26 @@ ApplicationWindow {
         anchors.fill: parent
         anchors.margins: 12
 
-        SplitKeyboard {
-            id: splitKeyboard
-            keymapModel: strataKeymapModel
-            showPositions: configManager ? configManager.showKeyPositions : false
+        Loader {
+            id: keyboardLoader
             anchors.centerIn: parent
+            sourceComponent: (strataKeymapModel && strataKeymapModel.layoutData && strataKeymapModel.layoutData.type === "macropad") ? macropadComponent : splitComponent
+        }
+
+        Component {
+            id: splitComponent
+            SplitKeyboard {
+                keymapModel: strataKeymapModel
+                showPositions: configManager ? configManager.showKeyPositions : false
+            }
+        }
+
+        Component {
+            id: macropadComponent
+            MacropadKeyboard {
+                keymapModel: strataKeymapModel
+                showPositions: configManager ? configManager.showKeyPositions : false
+            }
         }
     }
 
