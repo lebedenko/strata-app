@@ -10,19 +10,67 @@
     "rows": 5,
     "cols": 5,
     "rowsData": [
-      { "keys": [0, 1, 2, 3, 4] },
-      { "keys": [5, 6, 7, 8, 9] },
-      { "keys": [10, 11, 12, 13, 14] },
-      { "keys": [15, 16, 17, 18, 19] },
-      { "keys": [
-        { "pos": 20, "width": 52 },
-        { "pos": 21, "width": 110 },
-        { "pos": 22, "width": 52 },
-        { "pos": 23, "width": 52 }
-      ]}
+      {
+        "row": 0,
+        "keys": [
+          { "pos": 0, "col": 0 },
+          { "pos": 1, "col": 1 },
+          { "pos": 2, "col": 2 },
+          { "pos": 3, "col": 3 },
+          { "pos": 4, "col": 4 }
+        ]
+      },
+      {
+        "row": 1,
+        "keys": [
+          { "pos": 5, "col": 0 },
+          { "pos": 6, "col": 1 },
+          { "pos": 7, "col": 2 },
+          { "pos": 8, "col": 3 },
+          { "pos": 9, "col": 4, "height": 110, "rowSpan": 2 }
+        ]
+      },
+      {
+        "row": 2,
+        "keys": [
+          { "pos": 10, "col": 0 },
+          { "pos": 11, "col": 1 },
+          { "pos": 12, "col": 2 },
+          { "pos": 13, "col": 3 }
+        ]
+      },
+      {
+        "row": 3,
+        "keys": [
+          { "pos": 15, "col": 0 },
+          { "pos": 16, "col": 1 },
+          { "pos": 17, "col": 2 },
+          { "pos": 18, "col": 3 },
+          { "pos": 19, "col": 4, "height": 110, "rowSpan": 2 }
+        ]
+      },
+      {
+        "row": 4,
+        "keys": [
+          { "pos": 20, "col": 0 },
+          { "pos": 21, "col": 1, "width": 110, "colSpan": 2 },
+          { "pos": 22, "col": 3 }
+        ]
+      }
     ]
   },
-  "centerControls": [],
+  "centerControls": [
+    {
+      "type": "rotary_knob",
+      "sensorIndex": 0,
+      "pressPos": 14
+    },
+    {
+      "type": "rotary_knob",
+      "sensorIndex": 1,
+      "pressPos": 23
+    }
+  ],
   "sensorDefaults": {
     "0": {
       "0": { "behavior": "zoom", "cwLabel": "ZOOM-", "ccwLabel": "ZOOM+", "tooltip": "Zoom Control (CW: Zoom-, CCW: Zoom+)", "category": "nav" },

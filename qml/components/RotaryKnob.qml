@@ -140,10 +140,12 @@ Item {
 
                 Label {
                     text: root.pressLabel
-                    font.pointSize: root.pressLabel.length > 4 ? 6.5 : 7.5
+                    font.pointSize: root.pressLabel.length > 5 ? 5.5 : (root.pressLabel.length > 4 ? 6.5 : 7.5)
                     font.bold: true
                     color: textColor
                     anchors.horizontalCenter: parent.horizontalCenter
+                    width: parent.parent.width - 6
+                    horizontalAlignment: Text.AlignHCenter
                     elide: Text.ElideRight
                 }
 

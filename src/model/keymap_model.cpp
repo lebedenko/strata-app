@@ -213,6 +213,10 @@ QVariantMap KeymapModel::getSensorData(int sensorIndex, int pressPos) const {
     // 2. Get Press Key Data
     QVariantMap pressData = getKeyData(pressPos);
     QString pressLabel = pressData.value("primaryLabel", "PUSH").toString();
+    QString pressSecondary = pressData.value("secondaryLabel", "").toString();
+    if (!pressSecondary.isEmpty() && pressLabel != pressSecondary) {
+        pressLabel = pressSecondary + "+" + pressLabel;
+    }
     QString pressCategory = pressData.value("category", "media").toString();
     QString pressTooltip = pressData.value("tooltip", "Push Switch").toString();
 
@@ -226,6 +230,7 @@ QVariantMap KeymapModel::getSensorData(int sensorIndex, int pressPos) const {
                     {"tooltip", s.tooltip},
                     {"category", s.category},
                     {"pressLabel", pressLabel},
+                    {"pressSecondary", pressSecondary},
                     {"pressCategory", pressCategory},
                     {"pressTooltip", pressTooltip},
                     {"pressKeyPos", pressPos}};
@@ -254,6 +259,7 @@ QVariantMap KeymapModel::getSensorData(int sensorIndex, int pressPos) const {
                         {"tooltip", defObj.value("tooltip").toString("Rotary Encoder")},
                         {"category", defObj.value("category").toString("media")},
                         {"pressLabel", pressLabel},
+                        {"pressSecondary", pressSecondary},
                         {"pressCategory", pressCategory},
                         {"pressTooltip", pressTooltip},
                         {"pressKeyPos", pressPos}};
@@ -268,6 +274,7 @@ QVariantMap KeymapModel::getSensorData(int sensorIndex, int pressPos) const {
             {"tooltip", "Rotary Encoder"},
             {"category", "misc"},
             {"pressLabel", pressLabel},
+            {"pressSecondary", pressSecondary},
             {"pressCategory", pressCategory},
             {"pressTooltip", pressTooltip},
             {"pressKeyPos", pressPos}};

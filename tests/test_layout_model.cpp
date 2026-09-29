@@ -110,6 +110,11 @@ int main(int argc, char *argv[]) {
         auto rowsData = grid.value("rowsData").toArray();
         TEST_ASSERT(rowsData.size() == 5);
 
+        auto controls = obj.value("centerControls").toArray();
+        TEST_ASSERT(controls.size() == 2);
+        TEST_ASSERT(controls[0].toObject().value("pressPos").toInt() == 14);
+        TEST_ASSERT(controls[1].toObject().value("pressPos").toInt() == 23);
+
         std::cout << "[PASS] TwinDial 25 layout profile verified\n";
     }
 
@@ -154,11 +159,13 @@ int main(int argc, char *argv[]) {
         TEST_ASSERT(tdS0.value("hasData").toBool());
         TEST_ASSERT(tdS0.value("cwLabel").toString() == "ZOOM-");
         TEST_ASSERT(tdS0.value("ccwLabel").toString() == "ZOOM+");
+        TEST_ASSERT(tdS0.value("pressKeyPos").toInt() == 14);
 
         auto tdS1 = model.getSensorData(1);
         TEST_ASSERT(tdS1.value("hasData").toBool());
         TEST_ASSERT(tdS1.value("cwLabel").toString() == "VOL-");
         TEST_ASSERT(tdS1.value("ccwLabel").toString() == "VOL+");
+        TEST_ASSERT(tdS1.value("pressKeyPos").toInt() == 23);
 
         std::cout << "[PASS] KeymapModel declarative layout switching and sensor defaults\n";
     }

@@ -43,33 +43,45 @@ Item {
             RotaryKnob {
                 keymapModel: root.keymapModel
                 sensorIndex: 0
-                pressKeyPos: 0
+                pressKeyPos: 14
                 showPosition: root.showPositions
             }
         }
 
         // 5x5 Keypad Grid
-        Column {
+        Item {
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 6
+            implicitWidth: 284
+            implicitHeight: 284
+            width: 284
+            height: 284
 
             Repeater {
                 model: root.layoutData && root.layoutData.grid && root.layoutData.grid.rowsData ? root.layoutData.grid.rowsData : []
 
-                Row {
-                    id: gridRow
+                Item {
+                    id: rowScope
                     required property var modelData
-                    spacing: 6
+                    required property int index
+
+                    readonly property int rowIndex: (typeof modelData === "object" && modelData.row !== undefined) ? modelData.row : index
 
                     Repeater {
-                        model: gridRow.modelData.keys || []
+                        model: rowScope.modelData.keys || []
 
                         KeyCap {
                             required property var modelData
-                            readonly property int keyPos: (typeof modelData === "object" && modelData.pos !== undefined) ? modelData.pos : modelData
-                            readonly property real keyWidth: (typeof modelData === "object" && modelData.width !== undefined) ? modelData.width : 52
+                            required property int index
 
+                            readonly property int keyPos: (typeof modelData === "object" && modelData.pos !== undefined) ? modelData.pos : modelData
+                            readonly property int colIndex: (typeof modelData === "object" && modelData.col !== undefined) ? modelData.col : index
+                            readonly property real keyWidth: (typeof modelData === "object" && modelData.width !== undefined) ? modelData.width : 52
+                            readonly property real keyHeight: (typeof modelData === "object" && modelData.height !== undefined) ? modelData.height : 52
+
+                            x: colIndex * 58
+                            y: rowScope.rowIndex * 58
                             width: keyWidth
+                            height: keyHeight
                             position: keyPos
                             primaryText: keyProp(keyPos, "primaryLabel", "" + keyPos)
                             secondaryText: keyProp(keyPos, "secondaryLabel", "")
