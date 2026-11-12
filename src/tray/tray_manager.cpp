@@ -40,21 +40,19 @@ TrayManager::TrayManager(dbus::StrataDBusClient *client, config::ConfigManager *
                 &TrayManager::quitRequested);
     }
 
-    // Fallback to QSystemTrayIcon if platform theme provides a native tray (e.g. X11 / XEmbed)
-    if (QSystemTrayIcon::isSystemTrayAvailable()) {
-        qCInfo(lcTray) << "QSystemTrayIcon is available on this platform";
-        trayIcon_ = new QSystemTrayIcon(this);
-        trayIcon_->setIcon(QIcon(QStringLiteral(":/qt/qml/Strata/desktop/strata.svg")));
-        trayIcon_->setContextMenu(menu_);
-        connect(trayIcon_, &QSystemTrayIcon::activated, this, &TrayManager::onActivated);
-    } else {
-        qCInfo(lcTray) << "QSystemTrayIcon is not available; relying on direct StatusNotifierItem";
-    }
-
     if (client_) {
         connect(client_, &dbus::StrataDBusClient::statusChanged, this, &TrayManager::updateTooltip);
         connect(client_, &dbus::StrataDBusClient::activeLayerChanged, this,
                 &TrayManager::updateTooltip);
+    }
+
+    if (configMgr_) {
+        connect(configMgr_, &config::ConfigManager::configChanged, this, [this]() {
+            if (configMgr_->showTrayIcon())
+                show();
+            else
+                hide();
+        });
     }
 
     updateTooltip();
@@ -90,28 +88,24 @@ void TrayManager::createMenu() {
     connect(quitAction, &QAction::triggered, this, &TrayManager::quitRequested);
 }
 
+TrayManager::~TrayManager() {
+    delete menu_;
+}
+
+bool TrayManager::canHideToTray() const {
+    return configMgr_ && configMgr_->showTrayIcon() && sni_ && sni_->isRegistered();
+}
+
 void TrayManager::show() {
-    if (sni_) {
+    if (sni_)
         sni_->registerItem();
-    }
-    if (trayIcon_) {
-        trayIcon_->show();
-    }
+    emit canHideToTrayChanged();
 }
 
 void TrayManager::hide() {
-    if (sni_) {
+    if (sni_)
         sni_->unregisterItem();
-    }
-    if (trayIcon_) {
-        trayIcon_->hide();
-    }
-}
-
-void TrayManager::onActivated(QSystemTrayIcon::ActivationReason reason) {
-    if (reason == QSystemTrayIcon::Trigger || reason == QSystemTrayIcon::DoubleClick) {
-        emit toggleWindowRequested();
-    }
+    emit canHideToTrayChanged();
 }
 
 void TrayManager::onContextMenuRequested(int x, int y) {
@@ -141,10 +135,6 @@ void TrayManager::updateTooltip() {
 
     if (sni_) {
         sni_->setToolTip(title, desc);
-    }
-
-    if (trayIcon_) {
-        trayIcon_->setToolTip(QStringLiteral("%1\n%2").arg(title, desc));
     }
 }
 

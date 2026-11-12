@@ -11,13 +11,11 @@
 #include "model/keymap_model.hpp"
 #include "notification/notifier.hpp"
 #include "tray/tray_manager.hpp"
+#include "window.hpp"
 
 using namespace strata;
 
 int main(int argc, char *argv[]) {
-    // Suppress internal Qt Wayland warning regarding missing X11 systemTrayWindowChanged signal
-    QLoggingCategory::setFilterRules("qt.core.qobject.connect.warning=false\n");
-
     QApplication app(argc, argv);
     app.setApplicationName("Strata");
     app.setApplicationDisplayName("Strata");
@@ -49,6 +47,7 @@ int main(int argc, char *argv[]) {
     tray::TrayManager trayManager(&dbusClient, &configMgr);
 
     QQmlApplicationEngine engine;
+    engine.rootContext()->setContextProperty("trayManager", &trayManager);
     engine.rootContext()->setContextProperty("configManager", &configMgr);
     engine.rootContext()->setContextProperty("strataDBusClient", &dbusClient);
     engine.rootContext()->setContextProperty("strataKeymapModel", &keymapModel);
@@ -63,19 +62,7 @@ int main(int argc, char *argv[]) {
     if (!rootObjects.isEmpty()) {
         auto *window = qobject_cast<QQuickWindow *>(rootObjects.first());
         if (window) {
-            if (startMinimized || configMgr.startMinimized()) {
-                window->hide();
-            }
-
-            QObject::connect(&trayManager, &tray::TrayManager::toggleWindowRequested, [window]() {
-                if (window->isVisible()) {
-                    window->hide();
-                } else {
-                    window->showNormal();
-                    window->raise();
-                    window->requestActivate();
-                }
-            });
+            configureWindow(window, &trayManager, startMinimized || configMgr.startMinimized());
         }
     }
 

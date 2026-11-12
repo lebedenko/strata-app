@@ -10,6 +10,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
+#include <QSignalBlocker>
 #include <iostream>
 
 namespace strata::dbus {
@@ -24,12 +25,21 @@ StrataDBusClient::StrataDBusClient(QObject *parent)
     : QObject(parent) {
     setupDBusConnections();
     refreshDevices();
-    refreshStatus();
-    refreshLayers();
 }
 
 void StrataDBusClient::setupDBusConnections() {
     auto bus = QDBusConnection::sessionBus();
+
+    auto *watcher =
+        new QDBusServiceWatcher(ModernService, bus, QDBusServiceWatcher::WatchForOwnerChange, this);
+    connect(watcher, &QDBusServiceWatcher::serviceOwnerChanged, this,
+            [this](const QString &, const QString &, const QString &owner) {
+                availableDevices_.clear();
+                refreshActiveDevice({});
+                emit devicesChanged();
+                if (!owner.isEmpty())
+                    refreshDevices();
+            });
 
     // 1. Manager signals
     bus.connect(ModernService, ManagerPath, ManagerInterface, "DeviceAdded", this,
@@ -119,22 +129,8 @@ void StrataDBusClient::refreshDevices() {
         }
     }
 
-    if (newDevices.isEmpty()) {
-        activeDevicePath_.clear();
-        deviceId_.clear();
-        connected_ = false;
-        layersCount_ = 0;
-        isCached_ = false;
-        emit statusChanged();
-    } else if (!activePath.isEmpty() && activePath != "/") {
-        activeDevicePath_ = activePath;
-        deviceId_ = activeDevicePath_.section('/', -1);
-    } else if (activeDevicePath_.isEmpty() && !newDevices.isEmpty()) {
-        activeDevicePath_ = newDevices.first().toMap().value("path").toString();
-        deviceId_ = newDevices.first().toMap().value("id").toString();
-    }
-
     availableDevices_ = newDevices;
+    refreshActiveDevice(activePath);
     emit devicesChanged();
 }
 
@@ -145,9 +141,6 @@ bool StrataDBusClient::selectDevice(const QString &deviceId) {
         QDBusReply<bool> reply = mgrIface.call("SetActiveDevice", deviceId);
         if (reply.isValid() && reply.value()) {
             refreshDevices();
-            refreshStatus();
-            refreshLayers();
-            emit activeDeviceChanged(deviceId_, activeDevicePath_);
             return true;
         }
     }
@@ -275,6 +268,8 @@ void StrataDBusClient::clearCache() {
 }
 
 QJsonObject StrataDBusClient::fetchKeymapJson(int layer, bool forceRefresh) {
+    if (activeDevicePath_.isEmpty())
+        return {};
     auto devIface = makeDeviceInterface(KeymapInterface);
     if (!devIface->isValid())
         return {};
@@ -402,15 +397,45 @@ void StrataDBusClient::onDeviceRemovedSignal(const QDBusObjectPath &path, const 
 
 void StrataDBusClient::onActiveDeviceChangedSignal(const QDBusObjectPath &path,
                                                    const QString &deviceId) {
-    if (activeDevicePath_ == path.path() && deviceId_ == deviceId) {
-        return;
-    }
-    activeDevicePath_ = path.path();
-    deviceId_ = deviceId;
-    refreshStatus();
-    refreshLayers();
-    emit activeDeviceChanged(deviceId_, activeDevicePath_);
+    Q_UNUSED(deviceId);
+    refreshActiveDevice(path.path());
     emit devicesChanged();
+}
+
+void StrataDBusClient::clearDeviceState() {
+    connected_ = false;
+    deviceId_.clear();
+    deviceName_.clear();
+    deviceNode_.clear();
+    deviceType_.clear();
+    capabilities_.clear();
+    buildId_.clear();
+    activeLayerIndex_ = 0;
+    activeLayerName_ = "unknown";
+    activeLayerMask_ = 0;
+    layersCount_ = 0;
+    isCached_ = false;
+    layers_.clear();
+    setSelectedLayerIndex(0);
+}
+
+void StrataDBusClient::refreshActiveDevice(const QString &path) {
+    const QString normalized = path == "/" ? QString{} : path;
+    // Always reload: discovery may precede or follow ActiveDeviceChanged.
+    {
+        const QSignalBlocker blocker(this);
+        activeDevicePath_ = normalized;
+        clearDeviceState();
+        if (!activeDevicePath_.isEmpty()) {
+            refreshStatus();
+            refreshLayers();
+        }
+    }
+    emit selectedLayerChanged();
+    emit statusChanged();
+    emit layersChanged();
+    emit activeLayerChanged(activeLayerIndex_, activeLayerName_, activeLayerMask_);
+    emit activeDeviceChanged(deviceId_, activeDevicePath_);
 }
 
 } // namespace strata::dbus

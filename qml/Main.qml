@@ -15,7 +15,7 @@ ApplicationWindow {
     minimumHeight: 460
 
     onClosing: function(close) {
-        if (configManager && configManager.showTrayIcon) {
+        if (trayManager && trayManager.canHideToTray) {
             close.accepted = false;
             window.hide();
         }

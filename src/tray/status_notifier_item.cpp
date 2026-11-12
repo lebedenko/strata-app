@@ -217,7 +217,8 @@ void StatusNotifierItem::registerWithWatcher() {
 
 void StatusNotifierItem::onWatcherRegistered() {
     qCInfo(lcSni) << "StatusNotifierWatcher registered on D-Bus; re-registering item";
-    registerWithWatcher();
+    if (registered_)
+        registerWithWatcher();
 }
 
 void StatusNotifierItem::setTitle(const QString &title) {

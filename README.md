@@ -48,6 +48,8 @@ strata --minimized
 
 ---
 
+The tray uses StatusNotifierItem (SNI) exclusively; XEmbed-only panels are not supported. Qt Widgets remains required for the local context menu. Minimized startup and close-to-tray require an enabled tray and successful local D-Bus registration. If registration fails, the window stays accessible. Disabling the tray while the window is hidden shows it again; closing with no usable tray exits normally. The app may start hidden before a panel watcher appears and registers with it when it becomes available.
+
 ## Configuration (`~/.config/strata/config.toml`)
 
 ```toml

@@ -136,6 +136,26 @@ target_link_libraries(test_layout_model PRIVATE
 )
 add_test(NAME test_layout_model COMMAND test_layout_model)
 
+find_program(DBUS_RUN_SESSION dbus-run-session REQUIRED)
+add_executable(test_lifecycle
+    tests/test_lifecycle.cpp
+    src/dbus/strata_dbus_client.cpp
+    src/model/keymap_model.cpp
+    src/decoder/keycode_decoder.cpp
+    src/config/config_manager.cpp
+    src/tray/tray_manager.cpp
+    src/tray/status_notifier_item.cpp
+    src/tray/dbus_menu.cpp
+)
+target_include_directories(test_lifecycle PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_link_libraries(test_lifecycle PRIVATE Qt6::Widgets Qt6::DBus Qt6::Quick Qt6::Qml PkgConfig::TOML)
+add_test(NAME test_lifecycle COMMAND ${DBUS_RUN_SESSION} -- $<TARGET_FILE:test_lifecycle>)
+set_tests_properties(test_lifecycle PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_CONFIG_HOME=${CMAKE_CURRENT_BINARY_DIR}/test-config"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    TIMEOUT 60
+)
+
 # Installation
 include(GNUInstallDirs)
 

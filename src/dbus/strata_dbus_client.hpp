@@ -4,6 +4,7 @@
 #include <QDBusInterface>
 #include <QDBusMessage>
 #include <QDBusObjectPath>
+#include <QDBusServiceWatcher>
 #include <QJsonObject>
 #include <QObject>
 #include <QString>
@@ -99,6 +100,8 @@ private slots:
 
 private:
     void setupDBusConnections();
+    void refreshActiveDevice(const QString &path);
+    void clearDeviceState();
     std::unique_ptr<QDBusInterface> makeDeviceInterface(const QString &interfaceName);
     void parseStatusJson(const QString &jsonStr);
     void parseLayersJson(const QString &jsonStr);
