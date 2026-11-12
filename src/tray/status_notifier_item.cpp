@@ -22,7 +22,7 @@ QDBusArgument &operator<<(QDBusArgument &arg, const SniIconPixel &pix) {
     arg << pix.height;
     arg << pix.data;
     arg.endStructure();
-    return arg;
+    return arg; // NOLINT(bugprone-return-const-ref-from-parameter): Qt stream API.
 }
 
 const QDBusArgument &operator>>(const QDBusArgument &arg, SniIconPixel &pix) {
@@ -31,7 +31,7 @@ const QDBusArgument &operator>>(const QDBusArgument &arg, SniIconPixel &pix) {
     arg >> pix.height;
     arg >> pix.data;
     arg.endStructure();
-    return arg;
+    return arg; // NOLINT(bugprone-return-const-ref-from-parameter): Qt stream API.
 }
 
 QDBusArgument &operator<<(QDBusArgument &arg, const SniIconPixmapList &list) {
@@ -40,7 +40,7 @@ QDBusArgument &operator<<(QDBusArgument &arg, const SniIconPixmapList &list) {
         arg << item;
     }
     arg.endArray();
-    return arg;
+    return arg; // NOLINT(bugprone-return-const-ref-from-parameter): Qt stream API.
 }
 
 const QDBusArgument &operator>>(const QDBusArgument &arg, SniIconPixmapList &list) {
@@ -52,7 +52,7 @@ const QDBusArgument &operator>>(const QDBusArgument &arg, SniIconPixmapList &lis
         list.append(item);
     }
     arg.endArray();
-    return arg;
+    return arg; // NOLINT(bugprone-return-const-ref-from-parameter): Qt stream API.
 }
 
 QDBusArgument &operator<<(QDBusArgument &arg, const SniToolTip &tip) {
@@ -62,7 +62,7 @@ QDBusArgument &operator<<(QDBusArgument &arg, const SniToolTip &tip) {
     arg << tip.title;
     arg << tip.description;
     arg.endStructure();
-    return arg;
+    return arg; // NOLINT(bugprone-return-const-ref-from-parameter): Qt stream API.
 }
 
 const QDBusArgument &operator>>(const QDBusArgument &arg, SniToolTip &tip) {
@@ -72,13 +72,14 @@ const QDBusArgument &operator>>(const QDBusArgument &arg, SniToolTip &tip) {
     arg >> tip.title;
     arg >> tip.description;
     arg.endStructure();
-    return arg;
+    return arg; // NOLINT(bugprone-return-const-ref-from-parameter): Qt stream API.
 }
 
 static void registerTrayMetaTypes() {
     static bool registered = false;
-    if (registered)
+    if (registered) {
         return;
+    }
     qDBusRegisterMetaType<SniIconPixel>();
     qDBusRegisterMetaType<SniIconPixmapList>();
     qDBusRegisterMetaType<SniToolTip>();
@@ -90,7 +91,7 @@ static SniIconPixel imageToSniPixel(const QImage &src) {
     SniIconPixel pix;
     pix.width = image.width();
     pix.height = image.height();
-    pix.data.resize(static_cast<qsizetype>(pix.width * pix.height * 4));
+    pix.data.resize(static_cast<qsizetype>(pix.width) * pix.height * 4);
 
     auto *dest = reinterpret_cast<uchar *>(pix.data.data());
     for (int y = 0; y < image.height(); ++y) {
@@ -140,8 +141,9 @@ QString StatusNotifierItem::iconThemePath() const {
 }
 
 bool StatusNotifierItem::registerItem() {
-    if (registered_)
+    if (registered_) {
         return true;
+    }
 
     auto bus = QDBusConnection::sessionBus();
     if (!bus.isConnected()) {
@@ -168,16 +170,14 @@ bool StatusNotifierItem::registerItem() {
         return false;
     }
 
-    if (menuService_) {
-        if (!bus.registerObject(QStringLiteral("/MenuBar"), menuService_,
-                                QDBusConnection::ExportAllContents)) {
-            qCWarning(lcSni) << "Failed to export /MenuBar on D-Bus";
-        }
+    if (menuService_ != nullptr && !bus.registerObject(QStringLiteral("/MenuBar"), menuService_,
+                                                       QDBusConnection::ExportAllContents)) {
+        qCWarning(lcSni) << "Failed to export /MenuBar on D-Bus";
     }
 
     registered_ = true;
 
-    if (!watcherTracker_) {
+    if (watcherTracker_ == nullptr) {
         watcherTracker_ =
             new QDBusServiceWatcher(QStringLiteral("org.kde.StatusNotifierWatcher"), bus,
                                     QDBusServiceWatcher::WatchForRegistration, this);
@@ -190,8 +190,9 @@ bool StatusNotifierItem::registerItem() {
 }
 
 void StatusNotifierItem::unregisterItem() {
-    if (!registered_)
+    if (!registered_) {
         return;
+    }
 
     auto bus = QDBusConnection::sessionBus();
     bus.unregisterObject(QStringLiteral("/MenuBar"));
@@ -217,8 +218,9 @@ void StatusNotifierItem::registerWithWatcher() {
 
 void StatusNotifierItem::onWatcherRegistered() {
     qCInfo(lcSni) << "StatusNotifierWatcher registered on D-Bus; re-registering item";
-    if (registered_)
+    if (registered_) {
         registerWithWatcher();
+    }
 }
 
 void StatusNotifierItem::setTitle(const QString &title) {

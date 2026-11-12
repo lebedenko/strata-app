@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 
@@ -14,7 +16,8 @@ Item {
 
     // Fetch sensor data reactively
     readonly property var sensorData: {
-        if (!keymapModel) return null;
+        if (!keymapModel)
+            return null;
         var _rev = keymapModel.revision;
         return keymapModel.getSensorData(sensorIndex, pressKeyPos);
     }
@@ -41,8 +44,8 @@ Item {
         width: 104
         height: 104
         radius: width / 2
-        color: dialBg
-        border.color: dialBorder
+        color: root.dialBg
+        border.color: root.dialBorder
         border.width: 1.5
 
         // Subtle decorative outer ring
@@ -72,7 +75,7 @@ Item {
                     text: "⟲"
                     font.pointSize: 9
                     font.bold: true
-                    color: accentColor
+                    color: root.accentColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
@@ -80,7 +83,7 @@ Item {
                     text: root.ccwLabel
                     font.pointSize: 6.5
                     font.bold: true
-                    color: subTextColor
+                    color: root.subTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                     elide: Text.ElideRight
                     maximumLineCount: 1
@@ -104,7 +107,7 @@ Item {
                     text: "⟳"
                     font.pointSize: 9
                     font.bold: true
-                    color: accentColor
+                    color: root.accentColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
@@ -112,7 +115,7 @@ Item {
                     text: root.cwLabel
                     font.pointSize: 6.5
                     font.bold: true
-                    color: subTextColor
+                    color: root.subTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                     elide: Text.ElideRight
                     maximumLineCount: 1
@@ -127,12 +130,20 @@ Item {
             width: 44
             height: 44
             radius: width / 2
-            color: pressArea.containsMouse ? pressBtnHover : pressBtnBg
-            border.color: pressArea.containsMouse ? accentColor : dialBorder
+            color: pressArea.containsMouse ? root.pressBtnHover : root.pressBtnBg
+            border.color: pressArea.containsMouse ? root.accentColor : root.dialBorder
             border.width: 1.5
 
-            Behavior on color { ColorAnimation { duration: 150 } }
-            Behavior on border.color { ColorAnimation { duration: 150 } }
+            Behavior on color {
+                ColorAnimation {
+                    duration: 150
+                }
+            }
+            Behavior on border.color {
+                ColorAnimation {
+                    duration: 150
+                }
+            }
 
             Column {
                 anchors.centerIn: parent
@@ -142,7 +153,7 @@ Item {
                     text: root.pressLabel
                     font.pointSize: root.pressLabel.length > 5 ? 5.5 : (root.pressLabel.length > 4 ? 6.5 : 7.5)
                     font.bold: true
-                    color: textColor
+                    color: root.textColor
                     anchors.horizontalCenter: parent.horizontalCenter
                     width: parent.parent.width - 6
                     horizontalAlignment: Text.AlignHCenter
@@ -153,7 +164,7 @@ Item {
                     visible: root.showPosition
                     text: "#" + root.resolvedPressPos
                     font.pointSize: 5.5
-                    color: subTextColor
+                    color: root.subTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
@@ -174,7 +185,7 @@ Item {
         font.pointSize: 6.5
         font.bold: true
         font.letterSpacing: 1.5
-        color: subTextColor
+        color: root.subTextColor
     }
 
     // ToolTip covering the entire knob

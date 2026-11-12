@@ -44,7 +44,7 @@ tasks:
     desc: Run clang-tidy on source files
     deps: [configure]
     cmds:
-      - clang-tidy -p build src/**/*.cpp
+      - python3 tooling/checks.py clang-tidy
 
   clean:
     desc: Remove build artifacts
@@ -73,3 +73,94 @@ tasks:
     deps: [build]
     cmds:
       - ./build/strata --minimized
+
+  check-lvl1:
+    desc: Run cumulative level 1 checks and save reports
+    cmds:
+      - python3 tooling/checks.py lvl1
+
+  check-lvl2:
+    desc: Run cumulative level 2 checks and save reports
+    cmds:
+      - python3 tooling/checks.py lvl2
+
+  check-lvl3:
+    desc: Run cumulative level 3 checks and save reports
+    cmds:
+      - python3 tooling/checks.py lvl3
+
+  check:clang-format:
+    cmds:
+      - python3 tooling/checks.py clang-format
+
+  check:qmlformat:
+    cmds:
+      - python3 tooling/checks.py qmlformat
+
+  check:cmake-format:
+    cmds:
+      - python3 tooling/checks.py cmake-format
+
+  check:cmake-lint:
+    cmds:
+      - python3 tooling/checks.py cmake-lint
+
+  check:actionlint:
+    cmds:
+      - python3 tooling/checks.py actionlint
+
+  check:secrets-tree:
+    cmds:
+      - python3 tooling/checks.py secrets-tree
+
+  check:build:
+    cmds:
+      - python3 tooling/checks.py build
+
+  check:qmllint:
+    cmds:
+      - python3 tooling/checks.py qmllint
+
+  check:tests:
+    cmds:
+      - python3 tooling/checks.py tests
+
+  check:clang-tidy:
+    cmds:
+      - python3 tooling/checks.py clang-tidy
+
+  check:clazy:
+    cmds:
+      - python3 tooling/checks.py clazy
+
+  check:cppcheck:
+    cmds:
+      - python3 tooling/checks.py cppcheck
+
+  check:asan-ubsan:
+    cmds:
+      - python3 tooling/checks.py asan-ubsan
+
+  check:dependencies:
+    cmds:
+      - python3 tooling/checks.py dependencies
+
+  check:secrets-history:
+    cmds:
+      - python3 tooling/checks.py secrets-history
+
+  check:codeql:
+    cmds:
+      - python3 tooling/checks.py codeql
+
+  check:valgrind:
+    cmds:
+      - python3 tooling/checks.py valgrind
+
+  check:coverage:
+    cmds:
+      - python3 tooling/checks.py coverage
+
+  check:fuzz:
+    cmds:
+      - python3 tooling/checks.py fuzz

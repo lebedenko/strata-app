@@ -17,10 +17,10 @@ using namespace strata;
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
-    app.setApplicationName("Strata");
-    app.setApplicationDisplayName("Strata");
-    app.setOrganizationName("Strata");
-    app.setWindowIcon(QIcon(":/qt/qml/Strata/desktop/strata.svg"));
+    QApplication::setApplicationName("Strata");
+    QApplication::setApplicationDisplayName("Strata");
+    QApplication::setOrganizationName("Strata");
+    QApplication::setWindowIcon(QIcon(":/qt/qml/Strata/desktop/strata.svg"));
 
     bool startMinimized = false;
     for (int i = 1; i < argc; ++i) {
@@ -47,21 +47,21 @@ int main(int argc, char *argv[]) {
     tray::TrayManager trayManager(&dbusClient, &configMgr);
 
     QQmlApplicationEngine engine;
-    engine.rootContext()->setContextProperty("trayManager", &trayManager);
-    engine.rootContext()->setContextProperty("configManager", &configMgr);
-    engine.rootContext()->setContextProperty("strataDBusClient", &dbusClient);
-    engine.rootContext()->setContextProperty("strataKeymapModel", &keymapModel);
+    engine.setInitialProperties({{"trayManager", QVariant::fromValue(&trayManager)},
+                                 {"configManager", QVariant::fromValue(&configMgr)},
+                                 {"strataDBusClient", QVariant::fromValue(&dbusClient)},
+                                 {"strataKeymapModel", QVariant::fromValue(&keymapModel)}});
 
     QObject::connect(
         &engine, &QQmlApplicationEngine::objectCreationFailed, &app,
-        []() { QCoreApplication::exit(-1); }, Qt::QueuedConnection);
+        [] { QCoreApplication::exit(-1); }, Qt::QueuedConnection);
 
     engine.loadFromModule("Strata", "Main");
 
     auto rootObjects = engine.rootObjects();
     if (!rootObjects.isEmpty()) {
         auto *window = qobject_cast<QQuickWindow *>(rootObjects.first());
-        if (window) {
+        if (window != nullptr) {
             configureWindow(window, &trayManager, startMinimized || configMgr.startMinimized());
         }
     }
@@ -69,5 +69,5 @@ int main(int argc, char *argv[]) {
     QObject::connect(&trayManager, &tray::TrayManager::quitRequested, &app,
                      &QCoreApplication::quit);
 
-    return app.exec();
+    return QApplication::exec();
 }

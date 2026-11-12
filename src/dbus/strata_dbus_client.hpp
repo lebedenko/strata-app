@@ -40,14 +40,14 @@ public:
     explicit StrataDBusClient(QObject *parent = nullptr);
 
     [[nodiscard]] bool isConnected() const noexcept { return connected_; }
-    [[nodiscard]] QString deviceId() const noexcept { return deviceId_; }
-    [[nodiscard]] QString deviceName() const noexcept { return deviceName_; }
-    [[nodiscard]] QString deviceNode() const noexcept { return deviceNode_; }
-    [[nodiscard]] QString deviceType() const noexcept { return deviceType_; }
-    [[nodiscard]] QStringList capabilities() const noexcept { return capabilities_; }
-    [[nodiscard]] QString buildId() const noexcept { return buildId_; }
+    [[nodiscard]] const QString &deviceId() const noexcept { return deviceId_; }
+    [[nodiscard]] const QString &deviceName() const noexcept { return deviceName_; }
+    [[nodiscard]] const QString &deviceNode() const noexcept { return deviceNode_; }
+    [[nodiscard]] const QString &deviceType() const noexcept { return deviceType_; }
+    [[nodiscard]] const QStringList &capabilities() const noexcept { return capabilities_; }
+    [[nodiscard]] const QString &buildId() const noexcept { return buildId_; }
     [[nodiscard]] int activeLayerIndex() const noexcept { return activeLayerIndex_; }
-    [[nodiscard]] QString activeLayerName() const noexcept { return activeLayerName_; }
+    [[nodiscard]] const QString &activeLayerName() const noexcept { return activeLayerName_; }
     [[nodiscard]] uint activeLayerMask() const noexcept { return activeLayerMask_; }
     [[nodiscard]] int layersCount() const noexcept { return layersCount_; }
     [[nodiscard]] bool isCached() const noexcept { return isCached_; }
@@ -58,7 +58,7 @@ public:
     [[nodiscard]] const QVariantList &availableDevices() const noexcept {
         return availableDevices_;
     }
-    [[nodiscard]] QString activeDevicePath() const noexcept { return activeDevicePath_; }
+    [[nodiscard]] const QString &activeDevicePath() const noexcept { return activeDevicePath_; }
 
     Q_INVOKABLE void refreshDevices();
     Q_INVOKABLE bool selectDevice(const QString &deviceId);

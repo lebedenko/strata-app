@@ -14,7 +14,7 @@ Notifier::Notifier(dbus::StrataDBusClient *client, config::ConfigManager *config
     : QObject(parent)
     , client_(client)
     , configMgr_(configMgr) {
-    if (client_) {
+    if (client_ != nullptr) {
         connect(client_, &dbus::StrataDBusClient::activeLayerChanged, this,
                 &Notifier::onLayerChanged);
         connect(client_, &dbus::StrataDBusClient::deviceConnected, this,
@@ -25,7 +25,7 @@ Notifier::Notifier(dbus::StrataDBusClient *client, config::ConfigManager *config
 }
 
 void Notifier::notify(const QString &summary, const QString &body, int timeoutMs) {
-    if (!configMgr_ || !configMgr_->notificationsEnabled()) {
+    if ((configMgr_ == nullptr) || !configMgr_->notificationsEnabled()) {
         return;
     }
 
@@ -53,7 +53,7 @@ void Notifier::notify(const QString &summary, const QString &body, int timeoutMs
 
 void Notifier::onLayerChanged(int index, const QString &name, uint mask) {
     Q_UNUSED(mask);
-    if (!configMgr_ || !configMgr_->notifyLayerChanges()) {
+    if ((configMgr_ == nullptr) || !configMgr_->notifyLayerChanges()) {
         return;
     }
 

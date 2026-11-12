@@ -1,0 +1,8 @@
+[
+  {
+    "library": "/usr/lib/libQt6Core.so.6.12.0",
+    "sha256": "0d7cf0802b3bf2c67daf41525a9365ed77b6ccc62905c74a5c38087df00ac375",
+    "suppression": "qt612-arch4-stripped.valgrind.supp",
+    "reason": "Arch qt6-base 6.12.0-4 has stripped QtCore frames and matching debuginfod symbols were unavailable. Accept only the observed 16-byte metatype reads through GUI initialization/D-Bus slot lookup and Linux forkfd waitid(infop) probe. No leaks or application frames are suppressed. Re-review on any binary change."
+  }
+]

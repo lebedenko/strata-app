@@ -1,9 +1,19 @@
 Checks: >
   -*,
+  clang-analyzer-*,
   bugprone-*,
   modernize-*,
   performance-*,
-  readability-*
+  readability-*,
+  -modernize-use-trailing-return-type,
+  -readability-magic-numbers,
+  -readability-identifier-length,
+  -readability-convert-member-functions-to-static,
+  -readability-redundant-access-specifiers,
+  -readability-function-cognitive-complexity,
+  -readability-trailing-comma,
+  -bugprone-easily-swappable-parameters,
+  -performance-enum-size
 
-WarningsAsErrors: ''
-HeaderFilterRegex: 'src/.*'
+WarningsAsErrors: '*'
+HeaderFilterRegex: '(src|tests)/.*'

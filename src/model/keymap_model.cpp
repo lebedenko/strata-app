@@ -16,9 +16,9 @@ KeymapModel::KeymapModel(dbus::StrataDBusClient *client, QObject *parent)
     // Initial layout load
     loadLayout("eyelash_corne");
 
-    if (client_) {
+    if (client_ != nullptr) {
         connect(client_, &dbus::StrataDBusClient::selectedLayerChanged, this,
-                [this]() { setCurrentLayer(client_->selectedLayerIndex()); });
+                [this] { setCurrentLayer(client_->selectedLayerIndex()); });
 
         connect(client_, &dbus::StrataDBusClient::activeLayerChanged, this,
                 [this](int index, const QString &, uint) { setCurrentLayer(index); });
@@ -35,7 +35,7 @@ KeymapModel::KeymapModel(dbus::StrataDBusClient *client, QObject *parent)
                 &KeymapModel::onDeviceStateChanged);
 
         connect(client_, &dbus::StrataDBusClient::layersChanged, this,
-                [this]() { populateKeys(currentLayer_); });
+                [this] { populateKeys(currentLayer_); });
 
         connect(client_, &dbus::StrataDBusClient::deviceConnected, this,
                 [this](const QString &, const QString &, const QString &) {
@@ -50,8 +50,9 @@ KeymapModel::KeymapModel(dbus::StrataDBusClient *client, QObject *parent)
 }
 
 int KeymapModel::rowCount(const QModelIndex &parent) const {
-    if (parent.isValid())
+    if (parent.isValid()) {
         return 0;
+    }
     return static_cast<int>(keys_.size());
 }
 
@@ -149,8 +150,9 @@ bool KeymapModel::loadLayout(const QString &layoutId) {
 }
 
 void KeymapModel::updateLayoutFromDevice() {
-    if (!client_)
+    if (client_ == nullptr) {
         return;
+    }
 
     QString name = client_->deviceName().toLower();
     QString id = client_->deviceId().toLower();
@@ -197,7 +199,8 @@ QVariantMap KeymapModel::getSensorData(int sensorIndex, int pressPos) const {
     if (pressPos < 0) {
         pressPos = 34; // default fallback
         if (layoutJson_.contains("centerControls") && layoutJson_["centerControls"].isArray()) {
-            for (const auto &cVal : layoutJson_["centerControls"].toArray()) {
+            const auto controls = layoutJson_["centerControls"].toArray();
+            for (const auto &cVal : controls) {
                 if (cVal.isObject()) {
                     auto cObj = cVal.toObject();
                     if (cObj.value("type").toString() == "rotary_knob" &&
@@ -302,7 +305,7 @@ void KeymapModel::populateKeys(int layer) {
     QVector<SensorItem> newSensors;
 
     QJsonObject keymapObj;
-    if (client_) {
+    if (client_ != nullptr) {
         keymapObj = client_->fetchKeymapJson(layer);
     }
 
@@ -311,7 +314,7 @@ void KeymapModel::populateKeys(int layer) {
         QString layerKey = QString::number(layer);
 
         if (bindingsObj.contains(layerKey) && bindingsObj[layerKey].isArray()) {
-            QJsonArray arr = bindingsObj[layerKey].toArray();
+            const QJsonArray arr = bindingsObj[layerKey].toArray();
             for (const auto &val : arr) {
                 if (val.isObject()) {
                     QJsonObject bObj = val.toObject();
@@ -346,7 +349,7 @@ void KeymapModel::populateKeys(int layer) {
         QJsonObject sBindingsObj = keymapObj["sensor_bindings"].toObject();
         QString layerKey = QString::number(layer);
         if (sBindingsObj.contains(layerKey) && sBindingsObj[layerKey].isArray()) {
-            QJsonArray arr = sBindingsObj[layerKey].toArray();
+            const QJsonArray arr = sBindingsObj[layerKey].toArray();
             for (const auto &val : arr) {
                 if (val.isObject()) {
                     QJsonObject sObj = val.toObject();
@@ -367,8 +370,8 @@ void KeymapModel::populateKeys(int layer) {
     }
 
     // Sort keys by position
-    std::sort(newKeys.begin(), newKeys.end(),
-              [](const KeyItem &a, const KeyItem &b) { return a.position < b.position; });
+    std::ranges::sort(newKeys,
+                      [](const KeyItem &a, const KeyItem &b) { return a.position < b.position; });
 
     // If no keys parsed yet, create placeholder keys matching layout totalKeys
     if (newKeys.isEmpty()) {

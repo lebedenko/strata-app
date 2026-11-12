@@ -15,11 +15,11 @@
 
 namespace strata::dbus {
 
-static const QString ModernService = "io.github.lebedenko.Strata";
-static const QString ManagerPath = "/io/github/lebedenko/Strata/Manager";
-static const QString ManagerInterface = "io.github.lebedenko.Strata.Manager1";
-static const QString DeviceInterface = "io.github.lebedenko.Strata.Device1";
-static const QString KeymapInterface = "io.github.lebedenko.Strata.Keymap1";
+constexpr QLatin1StringView ModernService("io.github.lebedenko.Strata");
+constexpr QLatin1StringView ManagerPath("/io/github/lebedenko/Strata/Manager");
+constexpr QLatin1StringView ManagerInterface("io.github.lebedenko.Strata.Manager1");
+constexpr QLatin1StringView DeviceInterface("io.github.lebedenko.Strata.Device1");
+constexpr QLatin1StringView KeymapInterface("io.github.lebedenko.Strata.Keymap1");
 
 StrataDBusClient::StrataDBusClient(QObject *parent)
     : QObject(parent) {
@@ -37,25 +37,26 @@ void StrataDBusClient::setupDBusConnections() {
                 availableDevices_.clear();
                 refreshActiveDevice({});
                 emit devicesChanged();
-                if (!owner.isEmpty())
+                if (!owner.isEmpty()) {
                     refreshDevices();
+                }
             });
 
     // 1. Manager signals
     bus.connect(ModernService, ManagerPath, ManagerInterface, "DeviceAdded", this,
-                SLOT(onDeviceAddedSignal(QDBusObjectPath, QString)));
+                SLOT(onDeviceAddedSignal(QDBusObjectPath,QString)));
     bus.connect(ModernService, ManagerPath, ManagerInterface, "DeviceRemoved", this,
-                SLOT(onDeviceRemovedSignal(QDBusObjectPath, QString)));
+                SLOT(onDeviceRemovedSignal(QDBusObjectPath,QString)));
     bus.connect(ModernService, ManagerPath, ManagerInterface, "ActiveDeviceChanged", this,
-                SLOT(onActiveDeviceChangedSignal(QDBusObjectPath, QString)));
+                SLOT(onActiveDeviceChangedSignal(QDBusObjectPath,QString)));
 
     // 2. Device & Keymap signals across all device paths
     bus.connect(ModernService, QString(), DeviceInterface, "LayerChanged", this,
-                SLOT(onLayerChangedSignal(uint, QString, uint, QString, QDBusMessage)));
+                SLOT(onLayerChangedSignal(uint,QString,uint,QString,QDBusMessage)));
     bus.connect(ModernService, QString(), KeymapInterface, "KeymapLoaded", this,
-                SLOT(onKeymapLoadedSignal(QString, QString, uint, QDBusMessage)));
+                SLOT(onKeymapLoadedSignal(QString,QString,uint,QDBusMessage)));
     bus.connect(ModernService, QString(), KeymapInterface, "LayerBindingsLoaded", this,
-                SLOT(onLayerBindingsLoadedSignal(uint, uint, QDBusMessage)));
+                SLOT(onLayerBindingsLoadedSignal(uint,uint,QDBusMessage)));
 }
 
 void StrataDBusClient::setSelectedLayerIndex(int index) {
@@ -78,7 +79,7 @@ void StrataDBusClient::refreshDevices() {
         if (replyMsg.type() == QDBusMessage::ReplyMessage && !replyMsg.arguments().isEmpty()) {
             QVariant arg0 = replyMsg.arguments().at(0);
             if (arg0.userType() == qMetaTypeId<QDBusArgument>()) {
-                const QDBusArgument arg = arg0.value<QDBusArgument>();
+                const auto arg = arg0.value<QDBusArgument>();
                 if (arg.currentType() == QDBusArgument::ArrayType) {
                     arg.beginArray();
                     while (!arg.atEnd()) {
@@ -93,7 +94,7 @@ void StrataDBusClient::refreshDevices() {
             }
         }
 
-        for (const auto &pathStr : devPaths) {
+        for (const auto &pathStr : std::as_const(devPaths)) {
             QDBusInterface devIface(ModernService, pathStr, DeviceInterface, bus);
             if (devIface.isValid()) {
                 QDBusReply<QString> stReply = devIface.call("GetStatus");
@@ -173,8 +174,9 @@ void StrataDBusClient::refreshStatus() {
 
 void StrataDBusClient::parseStatusJson(const QString &jsonStr) {
     QJsonDocument doc = QJsonDocument::fromJson(jsonStr.toUtf8());
-    if (!doc.isObject())
+    if (!doc.isObject()) {
         return;
+    }
 
     QJsonObject obj = doc.object();
     connected_ = obj.value("connected").toBool(false);
@@ -188,7 +190,8 @@ void StrataDBusClient::parseStatusJson(const QString &jsonStr) {
 
     capabilities_.clear();
     if (obj.contains("capabilities") && obj["capabilities"].isArray()) {
-        for (const auto &c : obj["capabilities"].toArray()) {
+        const auto capabilities = obj["capabilities"].toArray();
+        for (const auto &c : capabilities) {
             capabilities_.append(c.toString());
         }
     }
@@ -230,11 +233,13 @@ void StrataDBusClient::refreshLayers() {
 
 void StrataDBusClient::parseLayersJson(const QString &jsonStr) {
     QJsonDocument doc = QJsonDocument::fromJson(jsonStr.toUtf8());
-    if (!doc.isArray())
+    if (!doc.isArray()) {
         return;
+    }
 
     QVariantList newList;
-    for (const auto &val : doc.array()) {
+    const auto layers = doc.array();
+    for (const auto &val : layers) {
         if (val.isObject()) {
             QJsonObject lObj = val.toObject();
             QVariantMap map;
@@ -268,15 +273,18 @@ void StrataDBusClient::clearCache() {
 }
 
 QJsonObject StrataDBusClient::fetchKeymapJson(int layer, bool forceRefresh) {
-    if (activeDevicePath_.isEmpty())
+    if (activeDevicePath_.isEmpty()) {
         return {};
+    }
     auto devIface = makeDeviceInterface(KeymapInterface);
-    if (!devIface->isValid())
+    if (!devIface->isValid()) {
         return {};
+    }
 
     QDBusReply<QString> reply = devIface->call("GetKeymap", static_cast<uint>(layer), forceRefresh);
-    if (!reply.isValid())
+    if (!reply.isValid()) {
         return {};
+    }
 
     QJsonDocument doc = QJsonDocument::fromJson(reply.value().toUtf8());
     return doc.isObject() ? doc.object() : QJsonObject{};

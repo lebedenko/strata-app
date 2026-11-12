@@ -41,22 +41,22 @@ class StatusNotifierItem : public QObject {
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", "org.kde.StatusNotifierItem")
 
-    Q_PROPERTY(QString Category READ category)
-    Q_PROPERTY(QString Id READ id)
-    Q_PROPERTY(QString Title READ title)
-    Q_PROPERTY(QString Status READ status)
-    Q_PROPERTY(int WindowId READ windowId)
-    Q_PROPERTY(QString IconThemePath READ iconThemePath)
-    Q_PROPERTY(bool ItemIsMenu READ itemIsMenu)
-    Q_PROPERTY(QDBusObjectPath Menu READ menu)
-    Q_PROPERTY(QString IconName READ iconName)
-    Q_PROPERTY(SniIconPixmapList IconPixmap READ iconPixmap)
-    Q_PROPERTY(QString OverlayIconName READ overlayIconName)
-    Q_PROPERTY(SniIconPixmapList OverlayIconPixmap READ overlayIconPixmap)
-    Q_PROPERTY(QString AttentionIconName READ attentionIconName)
-    Q_PROPERTY(SniIconPixmapList AttentionIconPixmap READ attentionIconPixmap)
-    Q_PROPERTY(QString AttentionMovieName READ attentionMovieName)
-    Q_PROPERTY(SniToolTip ToolTip READ toolTip)
+    Q_PROPERTY(QString Category READ category CONSTANT)
+    Q_PROPERTY(QString Id READ id CONSTANT)
+    Q_PROPERTY(QString Title READ title NOTIFY NewTitle)
+    Q_PROPERTY(QString Status READ status NOTIFY NewStatus)
+    Q_PROPERTY(int WindowId READ windowId CONSTANT)
+    Q_PROPERTY(QString IconThemePath READ iconThemePath CONSTANT)
+    Q_PROPERTY(bool ItemIsMenu READ itemIsMenu CONSTANT)
+    Q_PROPERTY(QDBusObjectPath Menu READ menu CONSTANT)
+    Q_PROPERTY(QString IconName READ iconName CONSTANT)
+    Q_PROPERTY(SniIconPixmapList IconPixmap READ iconPixmap NOTIFY NewIcon)
+    Q_PROPERTY(QString OverlayIconName READ overlayIconName CONSTANT)
+    Q_PROPERTY(SniIconPixmapList OverlayIconPixmap READ overlayIconPixmap CONSTANT)
+    Q_PROPERTY(QString AttentionIconName READ attentionIconName CONSTANT)
+    Q_PROPERTY(SniIconPixmapList AttentionIconPixmap READ attentionIconPixmap CONSTANT)
+    Q_PROPERTY(QString AttentionMovieName READ attentionMovieName CONSTANT)
+    Q_PROPERTY(SniToolTip ToolTip READ toolTip NOTIFY NewToolTip)
 
 public:
     explicit StatusNotifierItem(QObject *parent = nullptr);
@@ -68,8 +68,8 @@ public:
 
     [[nodiscard]] QString category() const { return QStringLiteral("Hardware"); }
     [[nodiscard]] QString id() const { return QStringLiteral("strata"); }
-    [[nodiscard]] QString title() const { return title_; }
-    [[nodiscard]] QString status() const { return status_; }
+    [[nodiscard]] const QString &title() const { return title_; }
+    [[nodiscard]] const QString &status() const { return status_; }
     [[nodiscard]] int windowId() const { return 0; }
     [[nodiscard]] QString iconThemePath() const;
     [[nodiscard]] bool itemIsMenu() const { return false; }
@@ -77,13 +77,13 @@ public:
         return QDBusObjectPath(QStringLiteral("/MenuBar"));
     }
     [[nodiscard]] QString iconName() const { return QStringLiteral("strata"); }
-    [[nodiscard]] SniIconPixmapList iconPixmap() const { return iconPixmaps_; }
+    [[nodiscard]] const SniIconPixmapList &iconPixmap() const { return iconPixmaps_; }
     [[nodiscard]] QString overlayIconName() const { return {}; }
     [[nodiscard]] SniIconPixmapList overlayIconPixmap() const { return {}; }
     [[nodiscard]] QString attentionIconName() const { return {}; }
     [[nodiscard]] SniIconPixmapList attentionIconPixmap() const { return {}; }
     [[nodiscard]] QString attentionMovieName() const { return {}; }
-    [[nodiscard]] SniToolTip toolTip() const { return toolTip_; }
+    [[nodiscard]] const SniToolTip &toolTip() const { return toolTip_; }
 
     [[nodiscard]] DBusMenuService *menuService() const { return menuService_; }
 

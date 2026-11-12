@@ -1,0 +1,28 @@
+# Use only through the SHA-256 guard in valgrind-libraries.json.
+{
+   qt612-arch4-gui-init-metatype-tail-read
+   Memcheck:Addr16
+   obj:/usr/lib/libQt6Core.so.6.12.0
+   obj:/usr/lib/libQt6Core.so.6.12.0
+   obj:/usr/lib/libQt6Core.so.6.12.0
+   fun:*QObject*connect*
+   fun:*QGuiApplicationPrivate*init*
+}
+{
+   qt612-arch4-dbus-metatype-tail-read
+   Memcheck:Addr16
+   obj:/usr/lib/libQt6Core.so.6.12.0
+   obj:/usr/lib/libQt6Core.so.6.12.0
+   obj:/usr/lib/libQt6Core.so.6.12.0
+   obj:/usr/lib/libQt6Core.so.6.12.0
+   fun:*QMetaObject*indexOfMethod*
+   fun:*QDBusConnectionPrivate*findSlot*
+}
+{
+   qt612-arch4-forkfd-waitid-null-infop
+   Memcheck:Param
+   waitid(infop)
+   fun:syscall
+   obj:/usr/lib/libQt6Core.so.6.12.0
+   obj:/usr/lib/libQt6Core.so.6.12.0
+}

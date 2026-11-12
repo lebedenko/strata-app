@@ -9,3 +9,6 @@ compile_commands.json
 .DS_Store
 *.user
 CMakeLists.txt.user
+reports/
+.tooling-venv/
+__pycache__/

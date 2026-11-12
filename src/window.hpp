@@ -12,12 +12,13 @@ inline void configureWindow(QQuickWindow *window, tray::TrayManager *trayManager
     }
 
     QObject::connect(trayManager, &tray::TrayManager::canHideToTrayChanged, window,
-                     [window, trayManager]() {
-                         if (!trayManager->canHideToTray() && !window->isVisible())
+                     [window, trayManager] {
+                         if (!trayManager->canHideToTray() && !window->isVisible()) {
                              window->showNormal();
+                         }
                      });
 
-    QObject::connect(trayManager, &tray::TrayManager::toggleWindowRequested, window, [window]() {
+    QObject::connect(trayManager, &tray::TrayManager::toggleWindowRequested, window, [window] {
         if (window->isVisible()) {
             window->hide();
         } else {

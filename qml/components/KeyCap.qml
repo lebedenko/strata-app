@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 
@@ -17,11 +19,16 @@ Item {
     // Category-specific subtle accent colors
     readonly property color accentColor: {
         switch (category) {
-        case "mod":   return "#f59e0b"; // Amber for modifiers
-        case "layer": return palette.highlight; // Theme highlight for layer switches
-        case "nav":   return "#a855f7"; // Purple for navigation/mouse
-        case "media": return "#10b981"; // Emerald for media
-        default:      return palette.placeholderText; // Theme placeholder for alphas/symbols
+        case "mod":
+            return "#f59e0b"; // Amber for modifiers
+        case "layer":
+            return palette.highlight; // Theme highlight for layer switches
+        case "nav":
+            return "#a855f7"; // Purple for navigation/mouse
+        case "media":
+            return "#10b981"; // Emerald for media
+        default:
+            return palette.placeholderText; // Theme placeholder for alphas/symbols
         }
     }
 
@@ -30,17 +37,21 @@ Item {
         anchors.fill: parent
         anchors.margins: 2
         radius: 8
-        color: mouseArea.containsMouse ? 
-               Qt.tint(palette.button, Qt.rgba(palette.highlight.r, palette.highlight.g, palette.highlight.b, 0.15)) : 
-               palette.button
+        color: mouseArea.containsMouse ? Qt.tint(palette.button, Qt.rgba(palette.highlight.r, palette.highlight.g, palette.highlight.b, 0.15)) : palette.button
 
-        border.color: mouseArea.containsMouse ? 
-                      root.accentColor : 
-                      palette.mid
+        border.color: mouseArea.containsMouse ? root.accentColor : palette.mid
         border.width: mouseArea.containsMouse ? 1.5 : 1
 
-        Behavior on color { ColorAnimation { duration: 120 } }
-        Behavior on border.color { ColorAnimation { duration: 120 } }
+        Behavior on color {
+            ColorAnimation {
+                duration: 120
+            }
+        }
+        Behavior on border.color {
+            ColorAnimation {
+                duration: 120
+            }
+        }
 
         // Position badge
         Label {
@@ -75,8 +86,10 @@ Item {
             anchors.centerIn: parent
             anchors.verticalCenterOffset: root.secondaryText.length > 0 ? 3 : 0
             font.pointSize: {
-                if (root.primaryText.length <= 2) return 10.5;
-                if (root.primaryText.length <= 4) return 8.5;
+                if (root.primaryText.length <= 2)
+                    return 10.5;
+                if (root.primaryText.length <= 4)
+                    return 8.5;
                 return 7.5;
             }
             font.bold: true

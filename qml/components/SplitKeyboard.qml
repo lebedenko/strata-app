@@ -1,6 +1,7 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Layouts
 
 Item {
     id: root
@@ -15,10 +16,12 @@ Item {
 
     // Helper function to fetch key properties reactively
     function keyProp(pos, prop, defaultVal) {
-        if (!keymapModel) return defaultVal;
+        if (!keymapModel)
+            return defaultVal;
         var _rev = keymapModel.revision;
         var data = keymapModel.getKeyData(pos);
-        if (data && data[prop] !== undefined) return data[prop];
+        if (data && data[prop] !== undefined)
+            return data[prop];
         return defaultVal;
     }
 
@@ -49,10 +52,10 @@ Item {
                         KeyCap {
                             required property int modelData
                             position: modelData
-                            primaryText: keyProp(modelData, "primaryLabel", "" + modelData)
-                            secondaryText: keyProp(modelData, "secondaryLabel", "")
-                            tooltipText: keyProp(modelData, "tooltip", "")
-                            category: keyProp(modelData, "category", "misc")
+                            primaryText: root.keyProp(modelData, "primaryLabel", "" + modelData)
+                            secondaryText: root.keyProp(modelData, "secondaryLabel", "")
+                            tooltipText: root.keyProp(modelData, "tooltip", "")
+                            category: root.keyProp(modelData, "category", "misc")
                             showPosition: root.showPositions
                         }
                     }
@@ -73,10 +76,10 @@ Item {
                     required property var modelData
                     position: modelData.pos
                     rotation: modelData.rotation !== undefined ? modelData.rotation : 0
-                    primaryText: keyProp(modelData.pos, "primaryLabel", "" + modelData.pos)
-                    secondaryText: keyProp(modelData.pos, "secondaryLabel", "")
-                    tooltipText: keyProp(modelData.pos, "tooltip", "")
-                    category: keyProp(modelData.pos, "category", "misc")
+                    primaryText: root.keyProp(modelData.pos, "primaryLabel", "" + modelData.pos)
+                    secondaryText: root.keyProp(modelData.pos, "secondaryLabel", "")
+                    tooltipText: root.keyProp(modelData.pos, "tooltip", "")
+                    category: root.keyProp(modelData.pos, "category", "misc")
                     showPosition: root.showPositions
                 }
             }
@@ -142,9 +145,9 @@ Item {
                             width: 34
                             height: 34
                             position: (controlDelegate.modelData && controlDelegate.modelData.upPos !== undefined) ? controlDelegate.modelData.upPos : 6
-                            primaryText: keyProp(position, "primaryLabel", "UP")
-                            secondaryText: keyProp(position, "secondaryLabel", "")
-                            tooltipText: keyProp(position, "tooltip", "")
+                            primaryText: root.keyProp(position, "primaryLabel", "UP")
+                            secondaryText: root.keyProp(position, "secondaryLabel", "")
+                            tooltipText: root.keyProp(position, "tooltip", "")
                             category: "nav"
                             showPosition: root.showPositions
                         }
@@ -156,9 +159,9 @@ Item {
                             width: 34
                             height: 34
                             position: (controlDelegate.modelData && controlDelegate.modelData.leftPos !== undefined) ? controlDelegate.modelData.leftPos : 19
-                            primaryText: keyProp(position, "primaryLabel", "LFT")
-                            secondaryText: keyProp(position, "secondaryLabel", "")
-                            tooltipText: keyProp(position, "tooltip", "")
+                            primaryText: root.keyProp(position, "primaryLabel", "LFT")
+                            secondaryText: root.keyProp(position, "secondaryLabel", "")
+                            tooltipText: root.keyProp(position, "tooltip", "")
                             category: "nav"
                             showPosition: root.showPositions
                         }
@@ -169,9 +172,9 @@ Item {
                             width: 34
                             height: 34
                             position: (controlDelegate.modelData && controlDelegate.modelData.centerPos !== undefined) ? controlDelegate.modelData.centerPos : 20
-                            primaryText: keyProp(position, "primaryLabel", "OK")
-                            secondaryText: keyProp(position, "secondaryLabel", "")
-                            tooltipText: keyProp(position, "tooltip", "")
+                            primaryText: root.keyProp(position, "primaryLabel", "OK")
+                            secondaryText: root.keyProp(position, "secondaryLabel", "")
+                            tooltipText: root.keyProp(position, "tooltip", "")
                             category: "nav"
                             showPosition: root.showPositions
                         }
@@ -183,9 +186,9 @@ Item {
                             width: 34
                             height: 34
                             position: (controlDelegate.modelData && controlDelegate.modelData.rightPos !== undefined) ? controlDelegate.modelData.rightPos : 21
-                            primaryText: keyProp(position, "primaryLabel", "RGT")
-                            secondaryText: keyProp(position, "secondaryLabel", "")
-                            tooltipText: keyProp(position, "tooltip", "")
+                            primaryText: root.keyProp(position, "primaryLabel", "RGT")
+                            secondaryText: root.keyProp(position, "secondaryLabel", "")
+                            tooltipText: root.keyProp(position, "tooltip", "")
                             category: "nav"
                             showPosition: root.showPositions
                         }
@@ -197,9 +200,9 @@ Item {
                             width: 34
                             height: 34
                             position: (controlDelegate.modelData && controlDelegate.modelData.downPos !== undefined) ? controlDelegate.modelData.downPos : 35
-                            primaryText: keyProp(position, "primaryLabel", "DWN")
-                            secondaryText: keyProp(position, "secondaryLabel", "")
-                            tooltipText: keyProp(position, "tooltip", "")
+                            primaryText: root.keyProp(position, "primaryLabel", "DWN")
+                            secondaryText: root.keyProp(position, "secondaryLabel", "")
+                            tooltipText: root.keyProp(position, "tooltip", "")
                             category: "nav"
                             showPosition: root.showPositions
                         }
@@ -236,10 +239,10 @@ Item {
                         KeyCap {
                             required property int modelData
                             position: modelData
-                            primaryText: keyProp(modelData, "primaryLabel", "" + modelData)
-                            secondaryText: keyProp(modelData, "secondaryLabel", "")
-                            tooltipText: keyProp(modelData, "tooltip", "")
-                            category: keyProp(modelData, "category", "misc")
+                            primaryText: root.keyProp(modelData, "primaryLabel", "" + modelData)
+                            secondaryText: root.keyProp(modelData, "secondaryLabel", "")
+                            tooltipText: root.keyProp(modelData, "tooltip", "")
+                            category: root.keyProp(modelData, "category", "misc")
                             showPosition: root.showPositions
                         }
                     }
@@ -260,10 +263,10 @@ Item {
                     required property var modelData
                     position: modelData.pos
                     rotation: modelData.rotation !== undefined ? modelData.rotation : 0
-                    primaryText: keyProp(modelData.pos, "primaryLabel", "" + modelData.pos)
-                    secondaryText: keyProp(modelData.pos, "secondaryLabel", "")
-                    tooltipText: keyProp(modelData.pos, "tooltip", "")
-                    category: keyProp(modelData.pos, "category", "misc")
+                    primaryText: root.keyProp(modelData.pos, "primaryLabel", "" + modelData.pos)
+                    secondaryText: root.keyProp(modelData.pos, "secondaryLabel", "")
+                    tooltipText: root.keyProp(modelData.pos, "tooltip", "")
+                    category: root.keyProp(modelData.pos, "category", "misc")
                     showPosition: root.showPositions
                 }
             }

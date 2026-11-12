@@ -1,0 +1,23 @@
+# Observed with Arch Qt 6.12.0 and Valgrind 3.25.1; see README.md.
+{
+   qt612-dbus-metatype-aes-tail-read
+   Memcheck:Addr16
+   ...
+   fun:*aeshash128*
+   ...
+   fun:*findMetaTypeByName*
+   ...
+   fun:*decodeMethodSignature*
+   ...
+   fun:*QDBusConnectionPrivate*findSlot*
+}
+{
+   qt612-forkfd-linux-waitid-null-infop
+   Memcheck:Param
+   waitid(infop)
+   fun:syscall
+   ...
+   fun:*vforkfd*
+   ...
+   fun:*QProcessPrivate*start*
+}

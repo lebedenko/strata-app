@@ -5,34 +5,34 @@ namespace strata::decoder {
 namespace {
 
 // ZMK modifier flags (dt-bindings/zmk/modifiers.h)
-constexpr uint8_t MOD_LCTL = 0x01;
-constexpr uint8_t MOD_LSFT = 0x02;
-constexpr uint8_t MOD_LALT = 0x04;
-constexpr uint8_t MOD_LGUI = 0x08;
-constexpr uint8_t MOD_RCTL = 0x10;
-constexpr uint8_t MOD_RSFT = 0x20;
-constexpr uint8_t MOD_RALT = 0x40;
-constexpr uint8_t MOD_RGUI = 0x80;
+constexpr uint32_t MOD_LCTL = 0x01U;
+constexpr uint32_t MOD_LSFT = 0x02U;
+constexpr uint32_t MOD_LALT = 0x04U;
+constexpr uint32_t MOD_LGUI = 0x08U;
+constexpr uint32_t MOD_RCTL = 0x10U;
+constexpr uint32_t MOD_RSFT = 0x20U;
+constexpr uint32_t MOD_RALT = 0x40U;
+constexpr uint32_t MOD_RGUI = 0x80U;
 
 uint8_t extractModifierMask(uint32_t code) {
-    uint8_t explicitMods = static_cast<uint8_t>((code >> 24) & 0xFF);
-    uint32_t usage = code & 0xFFFF;
-    uint8_t usageMod = 0;
+    auto explicitMods = static_cast<uint8_t>((code >> 24U) & 0xFFU);
+    uint32_t usage = code & 0xFFFFU;
+    uint32_t usageMod = 0;
 
-    if (usage >= 0xE0 && usage <= 0xE7) {
-        usageMod = static_cast<uint8_t>(1 << (usage - 0xE0));
-    } else if ((code >> 8) == 0 && code != 0) {
+    if (usage >= 0xE0U && usage <= 0xE7U) {
+        usageMod = static_cast<uint8_t>(1U << (usage - 0xE0U));
+    } else if ((code >> 8U) == 0 && code != 0) {
         // Pure modifier bitmask (e.g. MOD_LCTL | MOD_LSFT)
-        return static_cast<uint8_t>(code & 0xFF);
+        return static_cast<uint8_t>(code & 0xFFU);
     }
 
-    return explicitMods | usageMod;
+    return static_cast<uint8_t>(explicitMods | usageMod);
 }
 
 } // namespace
 
 QString KeycodeDecoder::modifierToLabel(uint32_t modCode) {
-    uint8_t mask = extractModifierMask(modCode);
+    uint32_t mask = extractModifierMask(modCode);
     bool hasCtrl = (mask & (MOD_LCTL | MOD_RCTL)) != 0;
     bool hasShift = (mask & (MOD_LSFT | MOD_RSFT)) != 0;
     bool hasAlt = (mask & (MOD_LALT | MOD_RALT)) != 0;
@@ -49,51 +49,61 @@ QString KeycodeDecoder::modifierToLabel(uint32_t modCode) {
     }
 
     // Common two-modifier combinations
-    if (hasCtrl && hasAlt && !hasShift && !hasGui)
+    if (hasCtrl && hasAlt && !hasShift && !hasGui) {
         return "C+A";
-    if (hasCtrl && hasShift && !hasAlt && !hasGui)
+    }
+    if (hasCtrl && hasShift && !hasAlt && !hasGui) {
         return "C+S";
-    if (hasAlt && hasShift && !hasCtrl && !hasGui)
+    }
+    if (hasAlt && hasShift && !hasCtrl && !hasGui) {
         return "A+S";
-    if (hasGui && hasCtrl && !hasShift && !hasAlt)
+    }
+    if (hasGui && hasCtrl && !hasShift && !hasAlt) {
         return "G+C";
-    if (hasGui && hasAlt && !hasShift && !hasCtrl)
+    }
+    if (hasGui && hasAlt && !hasShift && !hasCtrl) {
         return "G+A";
-    if (hasGui && hasShift && !hasCtrl && !hasAlt)
+    }
+    if (hasGui && hasShift && !hasCtrl && !hasAlt) {
         return "G+S";
+    }
 
     // Single modifiers
-    if (hasCtrl)
+    if (hasCtrl) {
         return "CTRL";
-    if (hasShift)
+    }
+    if (hasShift) {
         return "SHIFT";
-    if (hasAlt)
+    }
+    if (hasAlt) {
         return "ALT";
-    if (hasGui)
+    }
+    if (hasGui) {
         return "GUI";
+    }
 
     return "MOD";
 }
 
 QString KeycodeDecoder::hidUsageToLabel(uint32_t code) {
-    bool isShifted = (code & 0x02000000) != 0;
-    uint32_t page = (code >> 16) & 0xFF;
-    uint32_t usage = code & 0xFFFF;
+    bool isShifted = (code & 0x02000000U) != 0;
+    uint32_t page = (code >> 16U) & 0xFFU;
+    uint32_t usage = code & 0xFFFFU;
 
     // Consumer page
-    if (page == 0x0C) {
+    if (page == 0x0CU) {
         switch (usage) {
-        case 0xE2:
+        case 0xE2U:
             return "MUTE";
-        case 0xE9:
+        case 0xE9U:
             return "VOL+";
-        case 0xEA:
+        case 0xEAU:
             return "VOL-";
-        case 0xB5:
+        case 0xB5U:
             return "NEXT";
-        case 0xB6:
+        case 0xB6U:
             return "PREV";
-        case 0xCD:
+        case 0xCDU:
             return "PLAY";
         default:
             return QString("MEDIA(0x%1)").arg(usage, 0, 16);
@@ -102,47 +112,47 @@ QString KeycodeDecoder::hidUsageToLabel(uint32_t code) {
 
     if (isShifted) {
         switch (usage) {
-        case 0x1E:
+        case 0x1EU:
             return "!";
-        case 0x1F:
+        case 0x1FU:
             return "@";
-        case 0x20:
+        case 0x20U:
             return "#";
-        case 0x21:
+        case 0x21U:
             return "$";
-        case 0x22:
+        case 0x22U:
             return "%";
-        case 0x23:
+        case 0x23U:
             return "^";
-        case 0x24:
+        case 0x24U:
             return "&";
-        case 0x25:
+        case 0x25U:
             return "*";
-        case 0x26:
+        case 0x26U:
             return "(";
-        case 0x27:
+        case 0x27U:
             return ")";
-        case 0x2D:
+        case 0x2DU:
             return "_";
-        case 0x2E:
+        case 0x2EU:
             return "+";
-        case 0x2F:
+        case 0x2FU:
             return "{";
-        case 0x30:
+        case 0x30U:
             return "}";
-        case 0x31:
+        case 0x31U:
             return "|";
-        case 0x33:
+        case 0x33U:
             return ":";
-        case 0x34:
+        case 0x34U:
             return "\"";
-        case 0x35:
+        case 0x35U:
             return "~";
-        case 0x36:
+        case 0x36U:
             return "<";
-        case 0x37:
+        case 0x37U:
             return ">";
-        case 0x38:
+        case 0x38U:
             return "?";
         default:
             break;
@@ -150,123 +160,123 @@ QString KeycodeDecoder::hidUsageToLabel(uint32_t code) {
     }
 
     // Standard Keyboard / Keypad Page
-    if (usage >= 0x04 && usage <= 0x1D) {
-        return QString(QChar('A' + static_cast<char>(usage - 0x04)));
+    if (usage >= 0x04U && usage <= 0x1DU) {
+        return {QChar('A' + static_cast<char>(usage - 0x04U))};
     }
 
     switch (usage) {
-    case 0x1E:
+    case 0x1EU:
         return "1";
-    case 0x1F:
+    case 0x1FU:
         return "2";
-    case 0x20:
+    case 0x20U:
         return "3";
-    case 0x21:
+    case 0x21U:
         return "4";
-    case 0x22:
+    case 0x22U:
         return "5";
-    case 0x23:
+    case 0x23U:
         return "6";
-    case 0x24:
+    case 0x24U:
         return "7";
-    case 0x25:
+    case 0x25U:
         return "8";
-    case 0x26:
+    case 0x26U:
         return "9";
-    case 0x27:
+    case 0x27U:
         return "0";
-    case 0x28:
+    case 0x28U:
         return "ENTER";
-    case 0x29:
+    case 0x29U:
         return "ESC";
-    case 0x2A:
+    case 0x2AU:
         return "BSPC";
-    case 0x2B:
+    case 0x2BU:
         return "TAB";
-    case 0x2C:
+    case 0x2CU:
         return "SPACE";
-    case 0x2D:
+    case 0x2DU:
         return "-";
-    case 0x2E:
+    case 0x2EU:
         return "=";
-    case 0x2F:
+    case 0x2FU:
         return "[";
-    case 0x30:
+    case 0x30U:
         return "]";
-    case 0x31:
+    case 0x31U:
         return "\\";
-    case 0x33:
+    case 0x33U:
         return ";";
-    case 0x34:
+    case 0x34U:
         return "'";
-    case 0x35:
+    case 0x35U:
         return "`";
-    case 0x36:
+    case 0x36U:
         return ",";
-    case 0x37:
+    case 0x37U:
         return ".";
-    case 0x38:
+    case 0x38U:
         return "/";
-    case 0x39:
+    case 0x39U:
         return "CAPS";
-    case 0x3A:
+    case 0x3AU:
         return "F1";
-    case 0x3B:
+    case 0x3BU:
         return "F2";
-    case 0x3C:
+    case 0x3CU:
         return "F3";
-    case 0x3D:
+    case 0x3DU:
         return "F4";
-    case 0x3E:
+    case 0x3EU:
         return "F5";
-    case 0x3F:
+    case 0x3FU:
         return "F6";
-    case 0x40:
+    case 0x40U:
         return "F7";
-    case 0x41:
+    case 0x41U:
         return "F8";
-    case 0x42:
+    case 0x42U:
         return "F9";
-    case 0x43:
+    case 0x43U:
         return "F10";
-    case 0x44:
+    case 0x44U:
         return "F11";
-    case 0x45:
+    case 0x45U:
         return "F12";
-    case 0x46:
+    case 0x46U:
         return "PSCRN";
-    case 0x47:
+    case 0x47U:
         return "SCLK";
-    case 0x48:
+    case 0x48U:
         return "PAUSE";
-    case 0x49:
+    case 0x49U:
         return "INS";
-    case 0x4A:
+    case 0x4AU:
         return "HOME";
-    case 0x4B:
+    case 0x4BU:
         return "PGUP";
-    case 0x4C:
+    case 0x4CU:
         return "DEL";
-    case 0x4D:
+    case 0x4DU:
         return "END";
-    case 0x4E:
+    case 0x4EU:
         return "PGDN";
-    case 0x4F:
+    case 0x4FU:
         return "RIGHT";
-    case 0x50:
+    case 0x50U:
         return "LEFT";
-    case 0x51:
+    case 0x51U:
         return "DOWN";
-    case 0x52:
+    case 0x52U:
         return "UP";
-    case 0xE0:
-    case 0xE1:
-    case 0xE2:
-    case 0xE3:
-    case 0xE4:
-    case 0xE5:
-    case 0xE6:
-    case 0xE7: {
+    case 0xE0U:
+    case 0xE1U:
+    case 0xE2U:
+    case 0xE3U:
+    case 0xE4U:
+    case 0xE5U:
+    case 0xE6U:
+    case 0xE7U: {
         uint8_t modMask = extractModifierMask(code);
         bool hasCtrl = (modMask & (MOD_LCTL | MOD_RCTL)) != 0;
         bool hasShift = (modMask & (MOD_LSFT | MOD_RSFT)) != 0;
@@ -281,29 +291,30 @@ QString KeycodeDecoder::hidUsageToLabel(uint32_t code) {
         }
 
         switch (usage) {
-        case 0xE0:
+        case 0xE0U:
             return "LCTRL";
-        case 0xE1:
+        case 0xE1U:
             return "LSHIFT";
-        case 0xE2:
+        case 0xE2U:
             return "LALT";
-        case 0xE3:
+        case 0xE3U:
             return "LGUI";
-        case 0xE4:
+        case 0xE4U:
             return "RCTRL";
-        case 0xE5:
+        case 0xE5U:
             return "RSHIFT";
-        case 0xE6:
+        case 0xE6U:
             return "RALT";
-        case 0xE7:
+        case 0xE7U:
             return "RGUI";
         default:
             return QString("0x%1").arg(code, 0, 16);
         }
     }
     default:
-        if (code == 0)
+        if (code == 0) {
             return "";
+        }
         {
             uint8_t modMask = extractModifierMask(code);
             if (modMask != 0) {
@@ -311,10 +322,12 @@ QString KeycodeDecoder::hidUsageToLabel(uint32_t code) {
                 bool hasShift = (modMask & (MOD_LSFT | MOD_RSFT)) != 0;
                 bool hasAlt = (modMask & (MOD_LALT | MOD_RALT)) != 0;
                 bool hasGui = (modMask & (MOD_LGUI | MOD_RGUI)) != 0;
-                if (hasCtrl && hasShift && hasAlt && hasGui)
+                if (hasCtrl && hasShift && hasAlt && hasGui) {
                     return "HYPER";
-                if (hasCtrl && hasShift && hasAlt && !hasGui)
+                }
+                if (hasCtrl && hasShift && hasAlt && !hasGui) {
                     return "MEH";
+                }
             }
         }
         return QString("0x%1").arg(code, 0, 16);

@@ -18,7 +18,7 @@ QDBusArgument &operator<<(QDBusArgument &arg, const DBusMenuItem &item) {
     }
     arg.endArray();
     arg.endStructure();
-    return arg;
+    return arg; // NOLINT(bugprone-return-const-ref-from-parameter): Qt stream API.
 }
 
 const QDBusArgument &operator>>(const QDBusArgument &arg, DBusMenuItem &item) {
@@ -34,7 +34,7 @@ const QDBusArgument &operator>>(const QDBusArgument &arg, DBusMenuItem &item) {
     }
     arg.endArray();
     arg.endStructure();
-    return arg;
+    return arg; // NOLINT(bugprone-return-const-ref-from-parameter): Qt stream API.
 }
 
 DBusMenuService::DBusMenuService(QObject *parent)

@@ -67,3 +67,18 @@ window_width = 980
 window_height = 520
 show_key_positions = false
 ```
+
+## Quality checks
+
+Run `task check-lvl1` locally, `task check-lvl2` for CI analysis, or
+`task check-lvl3` for sequential nightly diagnostics. Levels are cumulative;
+individual tools use `task check:clang-tidy`, `task check:asan-ubsan`, etc.
+Install prerequisites described in [the reusable guide](docs/cpp-qt-qml-tools.md).
+Checks preserve source files and save logs, native results and JSON summaries in
+ignored `reports/`; inspect `reports/latest/summary.md` after any failure.
+Missing tools fail explicitly. Default build parallelism is two (`CHECK_JOBS`).
+The same guide can be kept at `~/Documents/cpp-qt-qml-tools.md` for other projects;
+repository checks do not depend on that external copy.
+
+See [pilot validation results](docs/tooling-validation.md) for measured timings,
+reviewed exceptions, and the outstanding distribution-advisory gate.

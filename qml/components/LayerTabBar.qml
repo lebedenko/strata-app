@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 
@@ -7,7 +9,8 @@ TabBar {
     required property var dbusClient
 
     function updateCurrentIndex() {
-        if (!dbusClient || !dbusClient.layers) return;
+        if (!dbusClient || !dbusClient.layers)
+            return;
         for (let i = 0; i < dbusClient.layers.length; ++i) {
             if (dbusClient.layers[i].index === dbusClient.selectedLayerIndex) {
                 if (currentIndex !== i) {

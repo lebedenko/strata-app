@@ -1,0 +1,9 @@
+[
+  {
+    "rule": "cpp/path-injection",
+    "file": "src/config/config_manager.cpp",
+    "source": "std::ofstream out(configPath_);",
+    "reason": "ConfigManager deliberately honors XDG_CONFIG_HOME/HOME supplied by the same desktop user. The nonprivileged process writes that user's chosen config location; no cross-user or elevated trust boundary exists. Re-review if this code gains privileges or accepts remote config paths.",
+    "file_sha256": "d63ab8e333592f1cc26975a838659b3c61c345460ccd7156a49713e4238b8286"
+  }
+]

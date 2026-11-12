@@ -24,11 +24,8 @@ int main(int argc, char *argv[]) {
 
     // 1. Verify Eyelash Corne layout profile directly
     {
-        QFile file("resources/layouts/eyelash_corne.json");
-        if (!file.open(QIODevice::ReadOnly)) {
-            file.setFileName("../resources/layouts/eyelash_corne.json");
-            TEST_ASSERT(file.open(QIODevice::ReadOnly));
-        }
+        QFile file(QStringLiteral(STRATA_SOURCE_DIR "/resources/layouts/eyelash_corne.json"));
+        TEST_ASSERT(file.open(QIODevice::ReadOnly));
         auto doc = QJsonDocument::fromJson(file.readAll());
         TEST_ASSERT(doc.isObject());
         auto obj = doc.object();
@@ -37,12 +34,12 @@ int main(int argc, char *argv[]) {
         TEST_ASSERT(obj.value("totalKeys").toInt() == 48);
 
         auto leftHalf = obj.value("leftHalf").toObject();
-        auto leftCols = leftHalf.value("columns").toArray();
+        const auto leftCols = leftHalf.value("columns").toArray();
         TEST_ASSERT(leftCols.size() == 6);
         TEST_ASSERT(leftHalf.value("thumbCluster").toArray().size() == 3);
 
         auto rightHalf = obj.value("rightHalf").toObject();
-        auto rightCols = rightHalf.value("columns").toArray();
+        const auto rightCols = rightHalf.value("columns").toArray();
         TEST_ASSERT(rightCols.size() == 6);
         TEST_ASSERT(rightHalf.value("thumbCluster").toArray().size() == 3);
 
@@ -56,11 +53,8 @@ int main(int argc, char *argv[]) {
 
     // 2. Verify ZSA Voyager layout profile directly
     {
-        QFile file("resources/layouts/voyager.json");
-        if (!file.open(QIODevice::ReadOnly)) {
-            file.setFileName("../resources/layouts/voyager.json");
-            TEST_ASSERT(file.open(QIODevice::ReadOnly));
-        }
+        QFile file(QStringLiteral(STRATA_SOURCE_DIR "/resources/layouts/voyager.json"));
+        TEST_ASSERT(file.open(QIODevice::ReadOnly));
         auto doc = QJsonDocument::fromJson(file.readAll());
         TEST_ASSERT(doc.isObject());
         auto obj = doc.object();
@@ -69,7 +63,7 @@ int main(int argc, char *argv[]) {
         TEST_ASSERT(obj.value("totalKeys").toInt() == 52);
 
         auto leftHalf = obj.value("leftHalf").toObject();
-        auto leftCols = leftHalf.value("columns").toArray();
+        const auto leftCols = leftHalf.value("columns").toArray();
         TEST_ASSERT(leftCols.size() == 6);
         // Each column has 4 keys
         for (const auto &colVal : leftCols) {
@@ -78,7 +72,7 @@ int main(int argc, char *argv[]) {
         TEST_ASSERT(leftHalf.value("thumbCluster").toArray().size() == 2);
 
         auto rightHalf = obj.value("rightHalf").toObject();
-        auto rightCols = rightHalf.value("columns").toArray();
+        const auto rightCols = rightHalf.value("columns").toArray();
         TEST_ASSERT(rightCols.size() == 6);
         for (const auto &colVal : rightCols) {
             TEST_ASSERT(colVal.toObject().value("keys").toArray().size() == 4);

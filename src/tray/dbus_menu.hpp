@@ -45,10 +45,10 @@ class DBusMenuService : public QObject {
                 "    <property type=\"as\" access=\"read\" name=\"IconThemePath\"/>\n"
                 "  </interface>\n")
 
-    Q_PROPERTY(uint Version READ version)
-    Q_PROPERTY(QString TextDirection READ textDirection)
-    Q_PROPERTY(QString Status READ status)
-    Q_PROPERTY(QStringList IconThemePath READ iconThemePath)
+    Q_PROPERTY(uint Version READ version CONSTANT)
+    Q_PROPERTY(QString TextDirection READ textDirection CONSTANT)
+    Q_PROPERTY(QString Status READ status CONSTANT)
+    Q_PROPERTY(QStringList IconThemePath READ iconThemePath CONSTANT)
 
 public:
     explicit DBusMenuService(QObject *parent = nullptr);

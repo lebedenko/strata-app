@@ -16,10 +16,10 @@ ConfigManager::ConfigManager(QObject *parent)
 }
 
 fs::path ConfigManager::resolveConfigPath() {
-    if (const char *xdg = std::getenv("XDG_CONFIG_HOME"); xdg && *xdg) {
+    if (const char *xdg = std::getenv("XDG_CONFIG_HOME"); (xdg != nullptr) && ((*xdg) != 0)) {
         return fs::path(xdg) / "strata" / "config.toml";
     }
-    if (const char *home = std::getenv("HOME"); home && *home) {
+    if (const char *home = std::getenv("HOME"); (home != nullptr) && ((*home) != 0)) {
         return fs::path(home) / ".config" / "strata" / "config.toml";
     }
     return fs::temp_directory_path() / "strata" / "config.toml";
@@ -34,12 +34,12 @@ bool ConfigManager::load() {
     try {
         toml::table tbl = toml::parse_file(configPath_.string());
 
-        if (auto general = tbl["general"].as_table()) {
+        if (auto *general = tbl["general"].as_table()) {
             config_.startMinimized = (*general)["start_minimized"].value_or(config_.startMinimized);
             config_.showTrayIcon = (*general)["show_tray_icon"].value_or(config_.showTrayIcon);
         }
 
-        if (auto notif = tbl["notifications"].as_table()) {
+        if (auto *notif = tbl["notifications"].as_table()) {
             config_.notificationsEnabled =
                 (*notif)["enabled"].value_or(config_.notificationsEnabled);
             config_.notifyLayerChanges =
@@ -48,7 +48,7 @@ bool ConfigManager::load() {
                 (*notif)["timeout_ms"].value_or(config_.notificationTimeoutMs);
         }
 
-        if (auto vis = tbl["visualizer"].as_table()) {
+        if (auto *vis = tbl["visualizer"].as_table()) {
             config_.windowWidth = (*vis)["window_width"].value_or(config_.windowWidth);
             config_.windowHeight = (*vis)["window_height"].value_or(config_.windowHeight);
             config_.showKeyPositions =

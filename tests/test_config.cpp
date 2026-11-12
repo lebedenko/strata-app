@@ -1,3 +1,4 @@
+#include <QTemporaryDir>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
@@ -19,9 +20,9 @@ namespace fs = std::filesystem;
 int main() {
     std::cout << "Running config tests...\n";
 
-    fs::path tempConfigDir = fs::temp_directory_path() / "strata_test_config";
-    fs::remove_all(tempConfigDir);
-    fs::create_directories(tempConfigDir);
+    QTemporaryDir temporary;
+    TEST_ASSERT(temporary.isValid());
+    fs::path tempConfigDir = temporary.path().toStdString();
 
     setenv("XDG_CONFIG_HOME", tempConfigDir.c_str(), 1);
 

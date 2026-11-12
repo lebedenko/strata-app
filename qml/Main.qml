@@ -1,21 +1,27 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Layouts
 import "components"
 
 ApplicationWindow {
     id: window
 
+    required property var trayManager
+    required property var configManager
+    required property var strataDBusClient
+    required property var strataKeymapModel
+
     visible: true
     title: qsTr("Strata - Keyboard Visualizer")
 
-    width: configManager ? configManager.windowWidth : 980
-    height: configManager ? configManager.windowHeight : 520
+    width: window.configManager ? window.configManager.windowWidth : 980
+    height: window.configManager ? window.configManager.windowHeight : 520
     minimumWidth: 840
     minimumHeight: 460
 
-    onClosing: function(close) {
-        if (trayManager && trayManager.canHideToTray) {
+    onClosing: function (close) {
+        if (window.trayManager && window.trayManager.canHideToTray) {
             close.accepted = false;
             window.hide();
         }
@@ -52,7 +58,7 @@ ApplicationWindow {
         // Layer Switcher in Center
         LayerTabBar {
             id: layerTabs
-            dbusClient: strataDBusClient
+            dbusClient: window.strataDBusClient
             anchors.centerIn: parent
         }
 
@@ -65,36 +71,38 @@ ApplicationWindow {
 
             ComboBox {
                 id: deviceSelector
-                visible: strataDBusClient && strataDBusClient.availableDevices && strataDBusClient.availableDevices.length > 1
+                visible: window.strataDBusClient && window.strataDBusClient.availableDevices && window.strataDBusClient.availableDevices.length > 1
                 anchors.verticalCenter: parent.verticalCenter
-                model: strataDBusClient ? strataDBusClient.availableDevices : []
+                model: window.strataDBusClient ? window.strataDBusClient.availableDevices : []
                 textRole: "name"
                 font.pointSize: 9
                 implicitHeight: 28
 
                 currentIndex: {
-                    if (!strataDBusClient || !strataDBusClient.availableDevices) return 0;
-                    for (var i = 0; i < strataDBusClient.availableDevices.length; ++i) {
-                        if (strataDBusClient.availableDevices[i].id === strataDBusClient.deviceId) return i;
+                    if (!window.strataDBusClient || !window.strataDBusClient.availableDevices)
+                        return 0;
+                    for (let i = 0; i < window.strataDBusClient.availableDevices.length; ++i) {
+                        if (window.strataDBusClient.availableDevices[i].id === window.strataDBusClient.deviceId)
+                            return i;
                     }
                     return 0;
                 }
 
-                onActivated: function(index) {
-                    if (strataDBusClient && strataDBusClient.availableDevices && index >= 0 && index < strataDBusClient.availableDevices.length) {
-                        strataDBusClient.selectDevice(strataDBusClient.availableDevices[index].id);
+                onActivated: function (index) {
+                    if (window.strataDBusClient && window.strataDBusClient.availableDevices && index >= 0 && index < window.strataDBusClient.availableDevices.length) {
+                        window.strataDBusClient.selectDevice(window.strataDBusClient.availableDevices[index].id);
                     }
                 }
             }
 
             CheckBox {
                 text: qsTr("Show Key IDs")
-                checked: configManager ? configManager.showKeyPositions : false
+                checked: window.configManager ? window.configManager.showKeyPositions : false
                 font.pointSize: 9
                 anchors.verticalCenter: parent.verticalCenter
                 onToggled: {
-                    if (configManager) {
-                        configManager.showKeyPositions = checked;
+                    if (window.configManager) {
+                        window.configManager.showKeyPositions = checked;
                     }
                 }
             }
@@ -110,22 +118,22 @@ ApplicationWindow {
         Loader {
             id: keyboardLoader
             anchors.centerIn: parent
-            sourceComponent: (strataKeymapModel && strataKeymapModel.layoutData && strataKeymapModel.layoutData.type === "macropad") ? macropadComponent : splitComponent
+            sourceComponent: (window.strataKeymapModel && window.strataKeymapModel.layoutData && window.strataKeymapModel.layoutData.type === "macropad") ? macropadComponent : splitComponent
         }
 
         Component {
             id: splitComponent
             SplitKeyboard {
-                keymapModel: strataKeymapModel
-                showPositions: configManager ? configManager.showKeyPositions : false
+                keymapModel: window.strataKeymapModel
+                showPositions: window.configManager ? window.configManager.showKeyPositions : false
             }
         }
 
         Component {
             id: macropadComponent
             MacropadKeyboard {
-                keymapModel: strataKeymapModel
-                showPositions: configManager ? configManager.showKeyPositions : false
+                keymapModel: window.strataKeymapModel
+                showPositions: window.configManager ? window.configManager.showKeyPositions : false
             }
         }
     }
@@ -133,6 +141,6 @@ ApplicationWindow {
     // Status Footer
     footer: StatusBar {
         id: statusBar
-        dbusClient: strataDBusClient
+        dbusClient: window.strataDBusClient
     }
 }

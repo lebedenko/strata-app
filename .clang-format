@@ -30,3 +30,4 @@ SpacesInAngles: false
 SpacesInSquareBrackets: false
 SpaceBeforeParens: ControlStatements
 SpaceInEmptyParentheses: false
+WhitespaceSensitiveMacros: [SLOT, SIGNAL]

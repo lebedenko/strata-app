@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 
@@ -29,9 +31,7 @@ ToolBar {
             }
 
             Label {
-                text: root.dbusClient && root.dbusClient.connected ? 
-                      root.dbusClient.deviceName + " (" + root.dbusClient.deviceNode + ")" : 
-                      qsTr("Keyboard Disconnected")
+                text: root.dbusClient && root.dbusClient.connected ? root.dbusClient.deviceName + " (" + root.dbusClient.deviceNode + ")" : qsTr("Keyboard Disconnected")
                 font.pointSize: 9
                 font.bold: true
                 anchors.verticalCenter: parent.verticalCenter
@@ -47,8 +47,7 @@ ToolBar {
 
                 Label {
                     id: typeText
-                    text: root.dbusClient.deviceType === "qmk_voyager" ? "QMK Raw HID" : 
-                          (root.dbusClient.deviceType === "zmk_raw_hid" ? "ZMK Raw HID" : root.dbusClient.deviceType.toUpperCase())
+                    text: root.dbusClient.deviceType === "qmk_voyager" ? "QMK Raw HID" : (root.dbusClient.deviceType === "zmk_raw_hid" ? "ZMK Raw HID" : root.dbusClient.deviceType.toUpperCase())
                     anchors.centerIn: parent
                     font.pointSize: 7.5
                     font.bold: true

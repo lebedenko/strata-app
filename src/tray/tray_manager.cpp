@@ -25,39 +25,42 @@ TrayManager::TrayManager(dbus::StrataDBusClient *client, config::ConfigManager *
     connect(sni_, &StatusNotifierItem::contextMenuRequested, this,
             &TrayManager::onContextMenuRequested);
 
-    if (sni_->menuService()) {
+    if (sni_->menuService() != nullptr) {
         connect(sni_->menuService(), &DBusMenuService::openVisualizerRequested, this,
                 &TrayManager::toggleWindowRequested);
-        connect(sni_->menuService(), &DBusMenuService::refreshKeymapRequested, this, [this]() {
-            if (client_)
+        connect(sni_->menuService(), &DBusMenuService::refreshKeymapRequested, this, [this] {
+            if (client_) {
                 client_->refreshKeymap();
+            }
         });
-        connect(sni_->menuService(), &DBusMenuService::clearCacheRequested, this, [this]() {
-            if (client_)
+        connect(sni_->menuService(), &DBusMenuService::clearCacheRequested, this, [this] {
+            if (client_) {
                 client_->clearCache();
+            }
         });
         connect(sni_->menuService(), &DBusMenuService::quitRequested, this,
                 &TrayManager::quitRequested);
     }
 
-    if (client_) {
+    if (client_ != nullptr) {
         connect(client_, &dbus::StrataDBusClient::statusChanged, this, &TrayManager::updateTooltip);
         connect(client_, &dbus::StrataDBusClient::activeLayerChanged, this,
                 &TrayManager::updateTooltip);
     }
 
-    if (configMgr_) {
-        connect(configMgr_, &config::ConfigManager::configChanged, this, [this]() {
-            if (configMgr_->showTrayIcon())
+    if (configMgr_ != nullptr) {
+        connect(configMgr_, &config::ConfigManager::configChanged, this, [this] {
+            if (configMgr_->showTrayIcon()) {
                 show();
-            else
+            } else {
                 hide();
+            }
         });
     }
 
     updateTooltip();
 
-    if (configMgr_ && configMgr_->showTrayIcon()) {
+    if ((configMgr_ != nullptr) && configMgr_->showTrayIcon()) {
         show();
     }
 }
@@ -71,15 +74,17 @@ void TrayManager::createMenu() {
     menu_->addSeparator();
 
     auto *refreshAction = menu_->addAction(tr("Refresh Keymap"));
-    connect(refreshAction, &QAction::triggered, this, [this]() {
-        if (client_)
+    connect(refreshAction, &QAction::triggered, this, [this] {
+        if (client_) {
             client_->refreshKeymap();
+        }
     });
 
     auto *clearAction = menu_->addAction(tr("Clear Cache"));
-    connect(clearAction, &QAction::triggered, this, [this]() {
-        if (client_)
+    connect(clearAction, &QAction::triggered, this, [this] {
+        if (client_) {
             client_->clearCache();
+        }
     });
 
     menu_->addSeparator();
@@ -93,24 +98,28 @@ TrayManager::~TrayManager() {
 }
 
 bool TrayManager::canHideToTray() const {
-    return configMgr_ && configMgr_->showTrayIcon() && sni_ && sni_->isRegistered();
+    return (configMgr_ != nullptr) && configMgr_->showTrayIcon() && (sni_ != nullptr) &&
+           sni_->isRegistered();
 }
 
 void TrayManager::show() {
-    if (sni_)
+    if (sni_ != nullptr) {
         sni_->registerItem();
+    }
     emit canHideToTrayChanged();
 }
 
 void TrayManager::hide() {
-    if (sni_)
+    if (sni_ != nullptr) {
         sni_->unregisterItem();
+    }
     emit canHideToTrayChanged();
 }
 
 void TrayManager::onContextMenuRequested(int x, int y) {
-    if (!menu_)
+    if (menu_ == nullptr) {
         return;
+    }
 
     QPoint pos(x, y);
     if (pos.isNull()) {
@@ -123,7 +132,7 @@ void TrayManager::updateTooltip() {
     QString title;
     QString desc;
 
-    if (client_ && client_->isConnected()) {
+    if ((client_ != nullptr) && client_->isConnected()) {
         title = tr("Strata: %1").arg(client_->deviceName());
         desc = tr("Active Layer: %1 (Index: %2)")
                    .arg(client_->activeLayerName())
@@ -133,7 +142,7 @@ void TrayManager::updateTooltip() {
         desc = tr("Keyboard Disconnected");
     }
 
-    if (sni_) {
+    if (sni_ != nullptr) {
         sni_->setToolTip(title, desc);
     }
 }

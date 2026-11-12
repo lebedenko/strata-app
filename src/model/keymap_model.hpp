@@ -66,13 +66,13 @@ public:
     [[nodiscard]] bool isLoading() const noexcept { return isLoading_; }
     [[nodiscard]] quint64 revision() const noexcept { return revision_; }
 
-    [[nodiscard]] QString layoutId() const noexcept { return layoutId_; }
+    [[nodiscard]] const QString &layoutId() const noexcept { return layoutId_; }
     void setLayoutId(const QString &id);
 
     [[nodiscard]] const QVariantMap &layoutData() const noexcept { return layoutData_; }
 
-    Q_INVOKABLE QVariantMap getKeyData(int position) const;
-    Q_INVOKABLE QVariantMap getSensorData(int sensorIndex, int pressPos = -1) const;
+    Q_INVOKABLE [[nodiscard]] QVariantMap getKeyData(int position) const;
+    Q_INVOKABLE [[nodiscard]] QVariantMap getSensorData(int sensorIndex, int pressPos = -1) const;
     Q_INVOKABLE void reload();
     Q_INVOKABLE bool loadLayout(const QString &layoutId);
 
