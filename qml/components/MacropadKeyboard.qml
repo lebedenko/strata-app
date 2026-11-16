@@ -1,6 +1,7 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Layouts
 
 Item {
     id: root
@@ -15,10 +16,12 @@ Item {
 
     // Helper function to fetch key properties reactively
     function keyProp(pos, prop, defaultVal) {
-        if (!keymapModel) return defaultVal;
+        if (!keymapModel)
+            return defaultVal;
         var _rev = keymapModel.revision;
         var data = keymapModel.getKeyData(pos);
-        if (data && data[prop] !== undefined) return data[prop];
+        if (data && data[prop] !== undefined)
+            return data[prop];
         return defaultVal;
     }
 
@@ -83,10 +86,10 @@ Item {
                             width: keyWidth
                             height: keyHeight
                             position: keyPos
-                            primaryText: keyProp(keyPos, "primaryLabel", "" + keyPos)
-                            secondaryText: keyProp(keyPos, "secondaryLabel", "")
-                            tooltipText: keyProp(keyPos, "tooltip", "")
-                            category: keyProp(keyPos, "category", "misc")
+                            primaryText: root.keyProp(keyPos, "primaryLabel", "" + keyPos)
+                            secondaryText: root.keyProp(keyPos, "secondaryLabel", "")
+                            tooltipText: root.keyProp(keyPos, "tooltip", "")
+                            category: root.keyProp(keyPos, "category", "misc")
                             showPosition: root.showPositions
                         }
                     }
